@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超级抽背大师 v2.0</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 1000px;
+            height: 750px;
+            max-width: 95%;
+            max-height: 90vh;
+            position: relative;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .header {
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #2575fc;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: #6a11cb;
+            margin-bottom: 1.5rem;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .config-label {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #6a11cb;
+            text-align: right;
+        }
+
+        .config-select {
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: 2px solid #6a11cb;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff9e6b 100%);
+            color: white;
+            padding: 14px 50px;
+            font-size: 1.4rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        /* 学情看板按钮 */
+        .btn-dashboard {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+            padding: 12px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        .btn-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .question-list {
+            width: 100%;
+            flex-grow: 1;
+            overflow-y: auto;
+            text-align: left;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-item {
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-left: 4px solid #6a11cb;
+            background-color: rgba(106, 17, 203, 0.05);
+            border-radius: 5px;
+            font-size: 1.3rem;
+            line-height: 1.5;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 12px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .recitation-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .question-panel, .student-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            color: #6a11cb;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .q-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .q-btn.available {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .q-btn.available:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .q-btn.used {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .q-btn.used:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-display {
+            flex-grow: 1;
+            background: #f8f9fa;
+            border: 2px solid #6a11cb;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            line-height: 1.4;
+            text-align: center;
+            overflow-y: auto;
+            font-weight: bold;
+            color: #2575fc;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .question-display.highlight {
+            animation: highlightQuestion 1s ease;
+        }
+
+        @keyframes highlightQuestion {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background-color: #e6f7ff; }
+            100% { transform: scale(1); }
+        }
+
+        .student-display {
+            flex-grow: 1;
+            background: white;
+            border: 2px solid #ff6b6b;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .ctrl-btn {
+            padding: 14px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .ctrl-btn.roll {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+
+        .ctrl-btn.stop {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff9e6b 100%);
+            color: white;
+        }
+
+        /* 通过/不通过按钮 */
+        .ctrl-btn.pass {
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            color: white;
+        }
+
+        .ctrl-btn.fail {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+            color: white;
+        }
+
+        .result-buttons {
+            display: none;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* 结果反馈动画 */
+        .result-feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .result-feedback.show-pass {
+            color: #4CAF50;
+            animation: feedbackAnim 1.5s ease forwards;
+        }
+
+        .result-feedback.show-fail {
+            color: #f44336;
+            animation: feedbackAnim 1.5s ease forwards;
+        }
+
+        @keyframes feedbackAnim {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        }
+
+        /* 智能抽选开关 */
+        .smart-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .smart-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .smart-toggle label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .smart-toggle .smart-hint {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .ctrl-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .rolling {
+            animation: pulse 0.8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+        }
+
+        .shuffle-btn {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .shuffle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ========== 学情看板样式 ========== */
+        .dashboard-page {
+            overflow-y: auto;
+        }
+
+        .dashboard-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .dashboard-header h2 {
+            margin-bottom: 0;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .dashboard-select {
+            padding: 8px 15px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 2px solid #4CAF50;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+            color: white;
+            padding: 8px 20px;
+            font-size: 1rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-clear-data {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+            color: white;
+            padding: 8px 20px;
+            font-size: 1rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-clear-data:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 标签页切换 */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            width: 100%;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: #4CAF50;
+            border-bottom-color: #4CAF50;
+        }
+
+        .tab-btn:hover {
+            color: #4CAF50;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 总览卡片 */
+        .overview-cards {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .overview-card {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            min-width: 140px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .overview-card .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .overview-card .card-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* 纯CSS条形图 */
+        .bar-chart {
+            width: 100%;
+            text-align: left;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            gap: 10px;
+        }
+
+        .bar-label {
+            min-width: 120px;
+            font-size: 0.95rem;
+            text-align: right;
+            color: #555;
+            flex-shrink: 0;
+        }
+
+        .bar-track {
+            flex-grow: 1;
+            height: 28px;
+            background: #f0f0f0;
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 14px;
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            transition: width 0.6s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            min-width: 0;
+        }
+
+        .bar-fill.low {
+            background: linear-gradient(90deg, #f44336 0%, #ff5722 100%);
+        }
+
+        .bar-fill.medium {
+            background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .bar-value {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .bar-value-outside {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #666;
+            margin-left: 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 学生表格 */
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .student-table th {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 10px 12px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+        }
+
+        .student-table td {
+            padding: 8px 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .student-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .student-table .rate-low {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .student-table .rate-medium {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .student-table .rate-high {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            font-size: 1.2rem;
+            padding: 40px 0;
+        }
+
+        /* 版本标签 */
+        .version-tag {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                height: auto;
+                min-height: 580px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .config-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .config-label {
+                text-align: center;
+            }
+
+            .recitation-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .student-display {
+                font-size: 2.5rem;
+                min-height: 120px;
+            }
+
+            .question-display {
+                font-size: 1.8rem;
+                min-height: 120px;
+                padding: 15px;
+            }
+
+            .q-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .btn-primary, .btn-secondary, .ctrl-btn {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+
+            .bar-label {
+                min-width: 80px;
+                font-size: 0.85rem;
+            }
+
+            .overview-card {
+                min-width: 100px;
+                padding: 10px 15px;
+            }
+
+            .overview-card .card-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面容器 -->
+    <div class="container">
+        <!-- 第1页：配置页 -->
+        <div class="page active" id="configPage">
+            <div class="header">
+                <h1>超级抽背大师</h1>
+                <div class="version-tag">v2.0 标准版 · 计分记录 + 学情看板 + 智能抽选</div>
+            </div>
+
+            <div class="config-grid">
+                <div class="config-label">班级</div>
+                <select id="classSelect" class="config-select">
+                    <option value="">--请选择--</option>
+                    <option value="高一8班" selected>高一8班</option>
+                    <option value="高一12班">高一12班</option>
+                    <option value="高一16班">高一16班</option>
+                    <option value="高一20班">高一20班</option>
+                </select>
+
+                <div class="config-label">课题</div>
+                <select id="topicSelect" class="config-select">
+                    <option value="">--请选择--</option>
+                    <option value="导论（时代精神的精华）">导论（时代精神的精华）</option>
+                    <option value="唯物论">唯物论</option>
+                    <option value="辩证法（上）" selected>辩证法（上）</option>
+                    <option value="辩证法（下）">辩证法（下）</option>
+                    <option value="认识论">认识论</option>
+                    <option value="历史唯物主义">历史唯物主义</option>
+                    <option value="实现人生的价值">实现人生的价值</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" id="startClassBtn">上课</button>
+            <button class="btn-dashboard" id="dashboardBtn">学情看板</button>
+            <div class="error-message" id="configError">请先选择班级和课题！</div>
+        </div>
+
+        <!-- 第2页：候课页 -->
+        <div class="page" id="waitingPage">
+            <button class="back-btn" id="backToConfigBtn1">←</button>
+            <div class="header">
+                <h1 id="classTopicTitle">高二7班 - 辩证法（上）</h1>
+                <h2>候课</h2>
+            </div>
+
+            <div class="question-list" id="questionListContainer">
+            </div>
+
+            <button class="btn-secondary" id="startRecitationBtn">开始抽背</button>
+        </div>
+
+        <!-- 第3页：抽背页 -->
+        <div class="page" id="recitationPage">
+            <button class="back-btn" id="backToQuestionListBtn">←</button>
+            <h1 id="recitationTitle">高二7班 - 辩证法（上）</h1>
+
+            <div class="recitation-layout">
+                <!-- 左侧：问题区域 -->
+                <div class="question-panel">
+                    <div class="panel-title">问题抽选</div>
+                    <div class="question-buttons" id="questionButtons">
+                    </div>
+                    <div class="question-display" id="currentQuestionDisplay">
+                        请选择一个问题
+                    </div>
+                    <button class="shuffle-btn" id="shuffleQuestionsBtn">随机排序问题</button>
+                </div>
+
+                <!-- 右侧：学生区域 -->
+                <div class="student-panel">
+                    <div class="panel-title">学生抽选</div>
+                    <div class="student-display" id="studentDisplay">
+                        ?
+                        <span class="result-feedback" id="resultFeedback"></span>
+                    </div>
+
+                    <div class="control-buttons" id="controlButtons">
+                        <button class="ctrl-btn roll" id="rollBtn">抽选</button>
+                        <button class="ctrl-btn stop" id="stopBtn">停止</button>
+                    </div>
+                    <div class="result-buttons" id="resultButtons">
+                        <button class="ctrl-btn pass" id="passBtn">通过 ✓</button>
+                        <button class="ctrl-btn fail" id="failBtn">不通过 ✗</button>
+                    </div>
+
+                    <div class="smart-toggle">
+                        <input type="checkbox" id="smartModeToggle">
+                        <label for="smartModeToggle">智能抽选</label>
+                        <span class="smart-hint">（优先抽薄弱生）</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第4页：学情看板 -->
+        <div class="page dashboard-page" id="dashboardPage">
+            <button class="back-btn" id="backToConfigBtn2">←</button>
+
+            <div class="dashboard-header">
+                <h2>学情看板</h2>
+                <div class="dashboard-controls">
+                    <select id="dashboardClassFilter" class="dashboard-select">
+                        <option value="all">全部班级</option>
+                        <option value="高一8班">高一8班</option>
+                        <option value="高一12班">高一12班</option>
+                        <option value="高一16班">高一16班</option>
+                        <option value="高一20班">高一20班</option>
+                    </select>
+                    <button class="btn-export" id="exportCsvBtn">导出CSV</button>
+                    <button class="btn-clear-data" id="clearDataBtn">清空数据</button>
+                </div>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab-btn active" data-tab="tabClass">按班级</button>
+                <button class="tab-btn" data-tab="tabStudent">按学生</button>
+                <button class="tab-btn" data-tab="tabTopic">按课题</button>
+            </div>
+
+            <div class="tab-content active" id="tabClass"></div>
+            <div class="tab-content" id="tabStudent"></div>
+            <div class="tab-content" id="tabTopic"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 第1步：数据层 — localStorage 读写模块 ==========
+        const STORAGE_KEY = 'chouBeiDaShi_records';
+
+        // 检测 localStorage 是否可用
+        function isStorageAvailable() {
+            try {
+                const testKey = '__storage_test__';
+                localStorage.setItem(testKey, '1');
+                localStorage.removeItem(testKey);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // 读取所有记录
+        function loadRecords() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error('读取记录失败:', e);
+                return [];
+            }
+        }
+
+        // 保存所有记录
+        function saveRecords(records) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            } catch (e) {
+                console.error('保存记录失败:', e);
+                alert('数据保存失败，可能存储空间已满');
+            }
+        }
+
+        // 新增一条记录
+        function addRecord(className, topic, student, question, result) {
+            const now = new Date();
+            const record = {
+                date: now.toLocaleDateString('zh-CN'),
+                time: now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+                className: className,
+                topic: topic,
+                student: student,
+                question: question,
+                result: result  // 'pass' 或 'fail'
+            };
+            const records = loadRecords();
+            records.push(record);
+            saveRecords(records);
+            return record;
+        }
+
+        // ========== 核心数据 ==========
+        const allClassStudents = {
+            "高一8班": ["王雨诺", "马樱萁", "颜秉泽", "朱政宇", "苏宇昂", "任乐意", "涂皓然", "许斯源", "刘浩然", "金轩宇", "王子旭", "方可尧", "孙文康", "张凌菲", "潘宝洋", "宋沐涵", "印子轩", "陈乃煌", "许其乐", "刘耕图", "孙笑笑", "韩耀东", "潘奕凯", "曹博", "苗文壮", "王诗俊", "王芸轩", "梁皓然", "张冉", "冯靖茹", "王文瑄", "刘佳鑫", "李昱辰", "陈俊艺", "葛建君", "赵仁杰", "李欣泽", "王安贤", "王冬", "邱子航", "王钰涵", "胡宇翔", "黄友乐", "李笑", "胡俊杰", "薛雅文", "孙畅", "崔毓轩", "顾涵博", "高梓茗", "于淳溪"],
+            "高一12班": ["倪梓赫", "张文豪", "朱姯耀", "穆威竹", "方添瑞", "刘昱辰", "王雨欣", "陈永翔", "张梓墨", "周诗雅", "田思涵", "李牧纯", "赵志烜", "郭茜蕊", "卞思辰", "卞一棱", "王姝珩", "刘语梵", "孙艺齐", "仲子茹", "林贝格", "龙威邑", "姜婧雯", "田金苗", "李梦洁", "杨滨如", "章馨月", "赵婉琪", "葛小朵", "张芸菲", "张书涵", "马君涵", "温佳蓉", "于清涵", "胡一凡", "王熠楷", "班瑞欣", "陈炳瑀"],
+            "高一16班": ["张冉佳", "陈欣妍", "刘耘珲", "朱芮娴", "侍津宇", "刘奕彤", "李依依", "万庆庆", "黄彦璋", "罗福山", "王谱霖", "蒋可睿", "吴思汶", "李语哲", "龚乙涵", "陈诗文", "吴承俊", "封思羽", "丁雅文", "王梓安", "刘浩宇", "窦星宇", "钱诗琦", "蒋沁言", "王怀博", "支禹泽", "李蕙妤", "徐鸣蔚", "范子萱", "唐煜杰", "张博", "陆熙哲", "刘婧", "李玉婷", "张圆圆", "王昱琦", "李语汐", "武楚涵", "仲新悦", "徐国方", "高煜然", "刘皓博", "王一哲", "徐新权", "王雨馨", "孙凡淼", "周思彤", "谢明辰", "王浩宇", "王山林", "乔煜卿", "李晓玲", "郭骐瑞", "朱祖贤"],
+            "高一20班": ["陈鹏", "刘前隆", "李国豪", "徐延谋", "闫晨浩", "立芸溪", "王溪源", "陶宣霖", "王嘉洋", "屠曦菡", "孙华阳", "霍云飞", "徐恺圻", "相俊宇", "许刚源", "刘宸宇", "庄士晏", "黄楚淇", "范芷含", "姜庆媛", "孙晟益", "谢林都", "邱睿喆", "刘加一", "高浩然", "李尚燃", "仲玟", "李昀键", "李光峰", "封润芝", "马浩然", "张炜翔", "茆珺彦", "李卓洋", "赵浩然", "李同川", "孙浩然", "张振涵", "江祥文", "王子阳", "李瑶", "钱一举", "何祉衡", "夏启哲", "颜秉轩", "鲍锦鹏", "王露翔", "张歆瑶", "曹艺馨", "徐梓航", "黄继民", "刘凡铭", "刘奕铭", "贾瀚翔", "闫智杰", "于济恺", "曾泓玮", "刘权庆"]
+        };
+
+        const topicQuestions = {
+            "导论（时代精神的精华）": [
+                "1. 哲学与世界观、方法论的关系",
+                "2. 哲学与具体科学的关系",
+                "3. 哲学的基本问题",
+                "4. 唯物主义和唯心主义的基本观点、基本形态",
+                "5. 哲学史上的"两个对子"、两大阵营",
+                "6. 马克思主义哲学的核心观点",
+                "7. 马克思主义中国化时代化的重大理论成果"
+            ],
+            "唯物论": [
+                "1. 物质的含义、唯一特性、固有的根本属性和存在方式",
+                "2. 意识是【人脑/大脑】的机能，【有/无】正误；内容【主观/客观】，形式【主观/客观】",
+                "3. 物质和意识是相互依赖吗？",
+                "4. 只谈物质忽视运动犯什么错？只谈运动忽视物质又犯什么错？",
+                "5. 什么是规律？能"创造"或"消灭"规律吗？ ",
+                "6. 正确发挥主观能动性的前提"
+            ],
+            "辩证法（上）": [
+                "1. 唯物辩证法的总特征、根本观点、实质和核心",
+                "2. 判断：a.任何两个事物之间都存在着联系b.人们可以根据需求建立新的联系",
+                "3. 什么是自在事物的联系？什么是人为事物的联系？他们是主观还是客观？",
+                "4. 【整体/部分】居于主导地位，立足【整体/部分】",
+                "5. 发展的实质（发展和运动、变化一样吗？）",
+                "6. 新旧事物的判断标准（区分：新事物、新出现的事物）",
+                "7. 发展的形式或状态（"量变必然导致质变"对吗？）",
+                "8. 辩证的否定的实质",
+                "9. 事物发展的前途、道路"
+            ],
+            "辩证法（下）": [
+                "1. 事物发展的源泉和动力是什么？",
+                "2. 矛盾的含义、基本属性",
+                "3. 【斗争性/同一性】寓于【斗争性/同一性】之中P61；【普遍性/特殊性】寓于【普遍性/特殊性】之中",
+                "4. 坚持唯物辩证法的前提",
+                "5. 矛盾问题的精髓",
+                "6. 什么对事物发展起决定作用？什么决定事物的性质？",
+                "7. 区别：主次矛、矛主次",
+                "8. 什么是"马克思主义活的灵魂"？正确认识事物的基础？解决矛盾的关键？",
+                "9. 唯物辩证法与形而上学对立的焦点和根本分歧"
+            ],
+            "认识论": [
+                "1. 感性认识与理性认识的关系",
+                "2. 什么是直接现实性？谁有？",
+                "3. 实践的三个特点",
+                "4. 获得认识的来源有几个？途径呢？",
+                "5. 【原理与方法论】实践与认识的辩证关系",
+                "6. 真理的含义、最基本属性、数量，内容【主观/客观】，形式【主观/客观】",
+                "7. 判断正误：a.真理和谬误相互包含b.真理是放之四海皆准的c.真理可以被超越、否定、推翻 ",
+                "8. 认识是怎么上升的？"
+            ],
+            "历史唯物主义": [
+                "1. 历史观的基本问题",
+                "2. 社会意识与社会存在同步吗？能促进社会发展吗？能起决定作用吗？",
+                "3. 【原理与方法论】社会存在与社会意识的辩证关系",
+                "4. 人类社会存在和发展的基础",
+                "5. 什么决定着社会的性质和面貌？决定着社会形态的更替？",
+                "6. 生产力、生产关系的基本要素",
+                "7. 社会历史发展的规律",
+                "8. 人类社会的基本矛盾",
+                "9. 社会发展的总趋势、过程",
+                "10. 社会发展的根本动力、直接动力",
+                "11. 改革的根本目的、作用",
+                "12. 人民群众的含义、地位、作用",
+                "13. 群众观点和群众路线的基本内容、地位"
+            ],
+            "实现人生的价值": [
+                "1. 评价一个人的最根本标准",
+                "2. 价值观有正误之分吗？都能起促进作用吗？能起决定作用吗？",
+                "3. 社会主义核心价值观的基本内容、层面",
+                "4. 价值判断和价值选择的关系？均源于什么？",
+                "5. 价值判断和价值选择的判断标准（最高的？）",
+                "6. 创造和实现人生价值的前提",
+                "7. 人生价值的创造与实现"
+            ]
+        };
+
+        // ========== 状态变量 ==========
+        let currentClass = "高一8班";
+        let currentTopic = "辩证法（上）";
+        let currentStudents = [];
+        let currentQuestions = [];
+        let usedQuestions = [];
+        let isRolling = false;
+        let rollInterval = null;
+        let lastSelectedQuestion = '';  // 记录当前选中的问题
+        let lastSelectedStudent = '';   // 记录当前抽中的学生
+        let storageAvailable = false;   // localStorage 是否可用
+
+        // ========== DOM元素 ==========
+        const configPage = document.getElementById('configPage');
+        const waitingPage = document.getElementById('waitingPage');
+        const recitationPage = document.getElementById('recitationPage');
+        const dashboardPage = document.getElementById('dashboardPage');
+
+        const classSelect = document.getElementById('classSelect');
+        const topicSelect = document.getElementById('topicSelect');
+        const startClassBtn = document.getElementById('startClassBtn');
+        const configError = document.getElementById('configError');
+        const dashboardBtn = document.getElementById('dashboardBtn');
+
+        const classTopicTitle = document.getElementById('classTopicTitle');
+        const questionListContainer = document.getElementById('questionListContainer');
+        const startRecitationBtn = document.getElementById('startRecitationBtn');
+        const backToConfigBtn1 = document.getElementById('backToConfigBtn1');
+
+        const recitationTitle = document.getElementById('recitationTitle');
+        const questionButtons = document.getElementById('questionButtons');
+        const currentQuestionDisplay = document.getElementById('currentQuestionDisplay');
+        const studentDisplay = document.getElementById('studentDisplay');
+        const rollBtn = document.getElementById('rollBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const backToQuestionListBtn = document.getElementById('backToQuestionListBtn');
+        const shuffleQuestionsBtn = document.getElementById('shuffleQuestionsBtn');
+        const controlButtons = document.getElementById('controlButtons');
+        const resultButtons = document.getElementById('resultButtons');
+        const passBtn = document.getElementById('passBtn');
+        const failBtn = document.getElementById('failBtn');
+        const resultFeedback = document.getElementById('resultFeedback');
+        const smartModeToggle = document.getElementById('smartModeToggle');
+
+        const backToConfigBtn2 = document.getElementById('backToConfigBtn2');
+        const dashboardClassFilter = document.getElementById('dashboardClassFilter');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+
+        // ========== 初始化 ==========
+        classSelect.value = currentClass;
+        topicSelect.value = currentTopic;
+
+        const synth = window.speechSynthesis;
+
+        function speakText(text, rate = 0.9, pitch = 1.0) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = rate;
+            utterance.pitch = pitch;
+            synth.speak(utterance);
+        }
+
+        // ========== 页面切换函数 ==========
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+            page.classList.add('active');
+        }
+
+        // ========== 配置页逻辑 ==========
+        startClassBtn.addEventListener('click', () => {
+            const selectedClass = classSelect.value;
+            const selectedTopic = topicSelect.value;
+
+            if (!selectedClass || !selectedTopic) {
+                configError.style.display = 'block';
+                return;
+            }
+
+            configError.style.display = 'none';
+
+            currentClass = selectedClass;
+            currentTopic = selectedTopic;
+            currentStudents = [...allClassStudents[currentClass]];
+            currentQuestions = [...topicQuestions[currentTopic]];
+            usedQuestions = [];
+
+            classTopicTitle.textContent = `${currentClass} - ${currentTopic}`;
+            renderQuestionList();
+            showPage(waitingPage);
+        });
+
+        // 学情看板按钮
+        dashboardBtn.addEventListener('click', () => {
+            renderDashboard();
+            showPage(dashboardPage);
+        });
+
+        function renderQuestionList() {
+            questionListContainer.innerHTML = '';
+            currentQuestions.forEach((question) => {
+                const questionItem = document.createElement('div');
+                questionItem.className = 'question-item';
+                questionItem.textContent = question;
+                questionListContainer.appendChild(questionItem);
+            });
+        }
+
+        // ========== 候课页逻辑 ==========
+        startRecitationBtn.addEventListener('click', () => {
+            recitationTitle.textContent = `${currentClass} - ${currentTopic}`;
+            renderQuestionButtons();
+            currentQuestionDisplay.textContent = '请选择一个问题';
+            studentDisplay.childNodes[0].textContent = '?';
+            lastSelectedQuestion = '';
+            lastSelectedStudent = '';
+            // 重置按钮状态
+            controlButtons.style.display = 'flex';
+            resultButtons.style.display = 'none';
+            showPage(recitationPage);
+        });
+
+        backToConfigBtn1.addEventListener('click', () => {
+            showPage(configPage);
+        });
+
+        // ========== 抽背页逻辑 ==========
+        function renderQuestionButtons() {
+            questionButtons.innerHTML = '';
+            const shuffledQuestions = [...currentQuestions];
+            shuffleArray(shuffledQuestions);
+
+            shuffledQuestions.forEach((question, index) => {
+                const button = document.createElement('button');
+                button.className = 'q-btn available';
+                button.textContent = index + 1;
+                button.dataset.question = question;
+
+                button.addEventListener('click', () => {
+                    if (button.classList.contains('available')) {
+                        const questionText = question.replace(/^\d+\.\s/, '');
+                        currentQuestionDisplay.textContent = questionText;
+                        lastSelectedQuestion = questionText;
+                        currentQuestionDisplay.classList.add('highlight');
+                        speakText(`问题：${questionText}`);
+
+                        setTimeout(() => {
+                            currentQuestionDisplay.classList.remove('highlight');
+                        }, 1000);
+
+                        button.classList.remove('available');
+                        button.classList.add('used');
+                        usedQuestions.push(question);
+                    }
+                });
+
+                questionButtons.appendChild(button);
+            });
+        }
+
+        shuffleQuestionsBtn.addEventListener('click', () => {
+            renderQuestionButtons();
+        });
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ========== 第3步：智能抽选模式 ==========
+        // 智能算法：计算每个学生的优先级分数
+        function getSmartTarget(students) {
+            if (!storageAvailable || students.length === 0) {
+                // 不可用时随机选
+                return students[Math.floor(Math.random() * students.length)];
+            }
+
+            const records = loadRecords();
+            // 只看当前班级的记录
+            const classRecords = records.filter(r => r.className === currentClass);
+
+            // 统计每个学生的被抽次数和通过次数
+            const stats = {};
+            students.forEach(s => {
+                stats[s] = { count: 0, passCount: 0 };
+            });
+            classRecords.forEach(r => {
+                if (stats[r.student] !== undefined) {
+                    stats[r.student].count++;
+                    if (r.result === 'pass') stats[r.student].passCount++;
+                }
+            });
+
+            // 排序：先按被抽次数升序，再按通过率升序
+            const sorted = [...students].sort((a, b) => {
+                const sa = stats[a], sb = stats[b];
+                // 被抽次数少的优先
+                if (sa.count !== sb.count) return sa.count - sb.count;
+                // 次数相同，通过率低的优先
+                const rateA = sa.count > 0 ? sa.passCount / sa.count : 0;
+                const rateB = sb.count > 0 ? sb.passCount / sb.count : 0;
+                if (rateA !== rateB) return rateA - rateB;
+                // 都相同则随机
+                return Math.random() - 0.5;
+            });
+
+            // 取最优先的那几个中随机选一个（前20%，至少1个）
+            const topN = Math.max(1, Math.floor(sorted.length * 0.2));
+            const candidates = sorted.slice(0, topN);
+            return candidates[Math.floor(Math.random() * candidates.length)];
+        }
+
+        // 学生抽选逻辑
+        rollBtn.addEventListener('click', () => {
+            if (currentStudents.length === 0) {
+                alert('所有学生都已抽选完毕！');
+                return;
+            }
+
+            isRolling = true;
+            studentDisplay.classList.add('rolling');
+
+            const isSmartMode = smartModeToggle.checked;
+
+            if (isSmartMode) {
+                // 智能模式：先滚动动画，2秒后停在目标学生
+                const target = getSmartTarget(currentStudents);
+
+                rollInterval = setInterval(() => {
+                    const randomIndex = Math.floor(Math.random() * currentStudents.length);
+                    studentDisplay.childNodes[0].textContent = currentStudents[randomIndex];
+                }, 100);
+
+                // 2秒后自动停止
+                setTimeout(() => {
+                    if (isRolling) {
+                        clearInterval(rollInterval);
+                        isRolling = false;
+                        studentDisplay.classList.remove('rolling');
+                        studentDisplay.childNodes[0].textContent = target;
+                        lastSelectedStudent = target;
+                        speakText(target, 1.0, 1.2);
+
+                        // 从列表移除
+                        const index = currentStudents.indexOf(target);
+                        if (index > -1) currentStudents.splice(index, 1);
+
+                        // 切换按钮：隐藏抽选/停止，显示通过/不通过
+                        controlButtons.style.display = 'none';
+                        resultButtons.style.display = 'flex';
+                    }
+                }, 2000);
+            } else {
+                // 普通模式：手动停止
+                rollInterval = setInterval(() => {
+                    const randomIndex = Math.floor(Math.random() * currentStudents.length);
+                    studentDisplay.childNodes[0].textContent = currentStudents[randomIndex];
+                }, 100);
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (!isRolling) return;
+
+            clearInterval(rollInterval);
+            isRolling = false;
+            studentDisplay.classList.remove('rolling');
+
+            const selectedStudent = studentDisplay.childNodes[0].textContent;
+            lastSelectedStudent = selectedStudent;
+            speakText(selectedStudent, 1.0, 1.2);
+
+            const index = currentStudents.indexOf(selectedStudent);
+            if (index > -1) {
+                currentStudents.splice(index, 1);
+            }
+
+            // 切换按钮：隐藏抽选/停止，显示通过/不通过
+            controlButtons.style.display = 'none';
+            resultButtons.style.display = 'flex';
+        });
+
+        // ========== 第2步：通过/不通过按钮 ==========
+        function handleResult(result) {
+            // 保存记录
+            if (storageAvailable && lastSelectedStudent) {
+                const questionToSave = lastSelectedQuestion || '未选择问题';
+                addRecord(currentClass, currentTopic, lastSelectedStudent, questionToSave, result);
+            }
+
+            // 显示反馈动画
+            resultFeedback.textContent = result === 'pass' ? '✓' : '✗';
+            resultFeedback.className = 'result-feedback ' + (result === 'pass' ? 'show-pass' : 'show-fail');
+
+            // 1.5秒后恢复
+            setTimeout(() => {
+                resultFeedback.className = 'result-feedback';
+                resultFeedback.textContent = '';
+                // 恢复抽选/停止按钮
+                controlButtons.style.display = 'flex';
+                resultButtons.style.display = 'none';
+            }, 1500);
+        }
+
+        passBtn.addEventListener('click', () => handleResult('pass'));
+        failBtn.addEventListener('click', () => handleResult('fail'));
+
+        // 返回候课页
+        backToQuestionListBtn.addEventListener('click', () => {
+            // 停止可能正在进行的滚动
+            if (isRolling) {
+                clearInterval(rollInterval);
+                isRolling = false;
+                studentDisplay.classList.remove('rolling');
+            }
+            showPage(waitingPage);
+        });
+
+        // ========== 第4步：学情看板页面 ==========
+        // 返回配置页
+        backToConfigBtn2.addEventListener('click', () => {
+            showPage(configPage);
+        });
+
+        // 筛选变化时重新渲染
+        dashboardClassFilter.addEventListener('change', () => {
+            renderDashboard();
+        });
+
+        // 标签页切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 渲染学情看板
+        function renderDashboard() {
+            const records = loadRecords();
+            const filter = dashboardClassFilter.value;
+            const filtered = filter === 'all' ? records : records.filter(r => r.className === filter);
+
+            renderTabClass(filtered, filter);
+            renderTabStudent(filtered);
+            renderTabTopic(filtered);
+        }
+
+        // 按班级标签页
+        function renderTabClass(records, filter) {
+            const container = document.getElementById('tabClass');
+
+            if (records.length === 0) {
+                container.innerHTML = '<div class="no-data">暂无抽背记录，快去抽背吧！</div>';
+                return;
+            }
+
+            const totalCount = records.length;
+            const passCount = records.filter(r => r.result === 'pass').length;
+            const passRate = totalCount > 0 ? Math.round(passCount / totalCount * 100) : 0;
+
+            // 按班级统计
+            const classStats = {};
+            records.forEach(r => {
+                if (!classStats[r.className]) classStats[r.className] = { total: 0, pass: 0 };
+                classStats[r.className].total++;
+                if (r.result === 'pass') classStats[r.className].pass++;
+            });
+
+            let html = `
+                <div class="overview-cards">
+                    <div class="overview-card">
+                        <div class="card-value">${totalCount}</div>
+                        <div class="card-label">总抽背次数</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-value">${passCount}</div>
+                        <div class="card-label">通过次数</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-value">${passRate}%</div>
+                        <div class="card-label">总通过率</div>
+                    </div>
+                </div>
+            `;
+
+            if (filter === 'all' && Object.keys(classStats).length > 0) {
+                html += '<div class="bar-chart">';
+                Object.entries(classStats)
+                    .sort((a, b) => (a[1].pass / a[1].total) - (b[1].pass / b[1].total))
+                    .forEach(([cls, stat]) => {
+                        const rate = Math.round(stat.pass / stat.total * 100);
+                        const barClass = rate < 50 ? 'low' : rate < 75 ? 'medium' : '';
+                        html += `
+                            <div class="bar-row">
+                                <div class="bar-label">${cls}</div>
+                                <div class="bar-track">
+                                    <div class="bar-fill ${barClass}" style="width: ${Math.max(rate, 2)}%">
+                                        ${rate >= 20 ? `<span class="bar-value">${rate}%</span>` : ''}
+                                    </div>
+                                </div>
+                                ${rate < 20 ? `<span class="bar-value-outside">${rate}%</span>` : ''}
+                            </div>
+                        `;
+                    });
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // 按学生标签页
+        function renderTabStudent(records) {
+            const container = document.getElementById('tabStudent');
+
+            if (records.length === 0) {
+                container.innerHTML = '<div class="no-data">暂无抽背记录</div>';
+                return;
+            }
+
+            // 按学生统计
+            const studentStats = {};
+            records.forEach(r => {
+                if (!studentStats[r.student]) studentStats[r.student] = { total: 0, pass: 0, className: r.className };
+                studentStats[r.student].total++;
+                if (r.result === 'pass') studentStats[r.student].pass++;
+            });
+
+            // 按通过率排序（低的在前）
+            const sorted = Object.entries(studentStats).sort((a, b) => {
+                const rateA = a[1].pass / a[1].total;
+                const rateB = b[1].pass / b[1].total;
+                return rateA - rateB;
+            });
+
+            let html = `
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>班级</th>
+                            <th>被抽次数</th>
+                            <th>通过次数</th>
+                            <th>通过率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            sorted.forEach(([name, stat]) => {
+                const rate = Math.round(stat.pass / stat.total * 100);
+                const rateClass = rate < 50 ? 'rate-low' : rate < 75 ? 'rate-medium' : 'rate-high';
+                html += `
+                    <tr>
+                        <td>${name}</td>
+                        <td>${stat.className}</td>
+                        <td>${stat.total}</td>
+                        <td>${stat.pass}</td>
+                        <td class="${rateClass}">${rate}%</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // 按课题标签页
+        function renderTabTopic(records) {
+            const container = document.getElementById('tabTopic');
+
+            if (records.length === 0) {
+                container.innerHTML = '<div class="no-data">暂无抽背记录</div>';
+                return;
+            }
+
+            // 按课题统计
+            const topicStats = {};
+            records.forEach(r => {
+                if (!topicStats[r.topic]) topicStats[r.topic] = { total: 0, pass: 0 };
+                topicStats[r.topic].total++;
+                if (r.result === 'pass') topicStats[r.topic].pass++;
+            });
+
+            let html = '<div class="bar-chart">';
+            Object.entries(topicStats)
+                .sort((a, b) => (a[1].pass / a[1].total) - (b[1].pass / b[1].total))
+                .forEach(([topic, stat]) => {
+                    const rate = Math.round(stat.pass / stat.total * 100);
+                    const barClass = rate < 50 ? 'low' : rate < 75 ? 'medium' : '';
+                    html += `
+                        <div class="bar-row">
+                            <div class="bar-label" title="${topic}">${topic.length > 8 ? topic.slice(0, 8) + '...' : topic}</div>
+                            <div class="bar-track">
+                                <div class="bar-fill ${barClass}" style="width: ${Math.max(rate, 2)}%">
+                                    ${rate >= 20 ? `<span class="bar-value">${stat.pass}/${stat.total} (${rate}%)</span>` : ''}
+                                </div>
+                            </div>
+                            ${rate < 20 ? `<span class="bar-value-outside">${stat.pass}/${stat.total} (${rate}%)</span>` : ''}
+                        </div>
+                    `;
+                });
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // ========== 第5步：CSV导出 ==========
+        exportCsvBtn.addEventListener('click', () => {
+            const records = loadRecords();
+            const filter = dashboardClassFilter.value;
+            const filtered = filter === 'all' ? records : records.filter(r => r.className === filter);
+
+            if (filtered.length === 0) {
+                alert('没有可导出的数据');
+                return;
+            }
+
+            // BOM头 + CSV内容
+            const BOM = '\uFEFF';
+            const header = '日期,时间,班级,课题,学生,问题,结果\n';
+            const rows = filtered.map(r => {
+                const resultText = r.result === 'pass' ? '通过' : '不通过';
+                // CSV中包含逗号或引号的字段需要用引号括起来
+                const escapeCsv = (s) => {
+                    if (s && (s.includes(',') || s.includes('"') || s.includes('\n'))) {
+                        return '"' + s.replace(/"/g, '""') + '"';
+                    }
+                    return s || '';
+                };
+                return [r.date, r.time, r.className, r.topic, r.student, escapeCsv(r.question), resultText].join(',');
+            }).join('\n');
+
+            const csvContent = BOM + header + rows;
+
+            try {
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                const dateStr = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
+                link.download = `抽背记录_${filter === 'all' ? '全部班级' : filter}_${dateStr}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                // 备选方案：弹出文本框让老师复制
+                const textarea = document.createElement('textarea');
+                textarea.value = header + rows;
+                textarea.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:60%;z-index:9999;font-size:14px;padding:20px;';
+                document.body.appendChild(textarea);
+                textarea.select();
+                alert('自动下载不支持，请复制文本框内容到Excel。按任意键关闭。');
+                textarea.addEventListener('blur', () => document.body.removeChild(textarea));
+            }
+        });
+
+        // 清空数据按钮
+        clearDataBtn.addEventListener('click', () => {
+            if (confirm('确定要清空所有抽背记录吗？此操作不可撤销！')) {
+                if (confirm('再次确认：真的要删除全部数据吗？')) {
+                    saveRecords([]);
+                    renderDashboard();
+                    alert('数据已清空');
+                }
+            }
+        });
+
+        // ========== 第6步：初始化检测和收尾 ==========
+        function initApp() {
+            // 检测 localStorage
+            storageAvailable = isStorageAvailable();
+            if (!storageAvailable) {
+                alert('提示：当前浏览器不支持本地存储，抽背记录将无法保存。\n建议使用 Chrome 或 Edge 浏览器打开此文件。');
+            }
+
+            currentStudents = [...allClassStudents[currentClass]];
+            currentQuestions = [...topicQuestions[currentTopic]];
+            renderQuestionList();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
