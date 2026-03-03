@@ -369,32 +369,6 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
         }
 
-        /* 智能抽选开关 */
-        .smart-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 12px;
-            font-size: 1rem;
-            color: #666;
-        }
-
-        .smart-toggle input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .smart-toggle label {
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .smart-toggle .smart-hint {
-            font-size: 0.85rem;
-            color: #999;
-        }
 
         .ctrl-btn:hover {
             transform: translateY(-2px);
@@ -707,12 +681,6 @@
             padding: 40px 0;
         }
 
-        /* 版本标签 */
-        .version-tag {
-            font-size: 0.85rem;
-            color: #999;
-            margin-top: 5px;
-        }
 
         @media (max-width: 768px) {
             .container {
@@ -787,7 +755,6 @@
         <div class="page active" id="configPage">
             <div class="header">
                 <h1>超级抽背大师</h1>
-                <div class="version-tag">v2.0 标准版 · 计分记录 + 学情看板 + 智能抽选</div>
             </div>
 
             <div class="config-grid">
@@ -866,11 +833,6 @@
                         <button class="ctrl-btn fail" id="failBtn">不通过 ✗</button>
                     </div>
 
-                    <div class="smart-toggle">
-                        <input type="checkbox" id="smartModeToggle">
-                        <label for="smartModeToggle">智能抽选</label>
-                        <span class="smart-hint">（优先抽薄弱生）</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1087,7 +1049,6 @@
         const passBtn = document.getElementById('passBtn');
         const failBtn = document.getElementById('failBtn');
         const resultFeedback = document.getElementById('resultFeedback');
-        const smartModeToggle = document.getElementById('smartModeToggle');
 
         const backToConfigBtn2 = document.getElementById('backToConfigBtn2');
         const dashboardClassFilter = document.getElementById('dashboardClassFilter');
@@ -1275,7 +1236,7 @@
             isRolling = true;
             studentDisplay.classList.add('rolling');
 
-            const isSmartMode = smartModeToggle.checked;
+            const isSmartMode = true; // 智能抽选默认开启
 
             if (isSmartMode) {
                 // 智能模式：先滚动动画，2秒后停在目标学生
