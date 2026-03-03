@@ -66,3 +66,37 @@
 3. 更新本文件的版本历史
 4. git add → git commit（message以版本号开头）→ git push
 5. 复制 HTML 到 U 盘带去教室使用
+
+## 怎么继续干活（防失忆指南）
+
+我（老师）和 Claude 都会失忆，靠以下文件恢复记忆：
+
+**Claude 的记忆**（它自动会读，不用我操心）：
+- 记忆笔记：记着项目在哪、版本规则、注意事项
+- CLAUDE.md：指向 Real/Cog/Spec 三个文件
+- Real.md / Cog.md / Spec.md：项目的完整上下文
+
+**我的记忆**（隔久了自己看一眼）：
+- `Spec.md`：看版本历史，回忆上次做到哪了
+- `git log`：看最近几次提交，回忆改了什么
+
+**每次新开对话，我只需要说一句话**：
+> 继续做超级抽背大师
+
+Claude 会自动读取所有文件，接上之前的进度。
+
+## 文件说明
+
+| 文件 | 给谁看 | 干什么用 |
+|------|--------|---------|
+| Real.md | Claude | 红线约束，改代码不能违反 |
+| Cog.md | Claude | 理解系统有哪些角色和关系 |
+| Spec.md | 我 + Claude | 功能清单、版本记录、工作流程 |
+| CLAUDE.md | Claude | 快速入口，指向其他文件 |
+| 超级抽背大师.html | 学生 | 产品本身，复制到U盘去上课 |
+
+## 项目地址
+
+- 本地：`~/Desktop/超级抽背大师/`
+- GitHub：`https://github.com/caoyue46/recite-master`
+- U盘部署：`/Volumes/U PAN/超级抽背大师.html`
