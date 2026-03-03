@@ -682,6 +682,54 @@
         }
 
 
+        /* 关注名单标签 */
+        .focus-section {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        .focus-title {
+            font-size: 1.1rem;
+            color: #999;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+
+        .focus-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .focus-tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+            background: white;
+            color: #666;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .focus-tag:hover {
+            border-color: #ff9800;
+        }
+
+        .focus-tag.focused {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+            color: white;
+            border-color: #ff9800;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .container {
                 height: auto;
@@ -794,6 +842,11 @@
             </div>
 
             <div class="question-list" id="questionListContainer">
+            </div>
+
+            <div class="focus-section">
+                <div class="focus-title">关注名单（点击姓名设置）</div>
+                <div class="focus-tags" id="focusTags"></div>
             </div>
 
             <button class="btn-secondary" id="startRecitationBtn">开始抽背</button>
@@ -921,6 +974,34 @@
             records.push(record);
             saveRecords(records);
             return record;
+        }
+
+        // ========== 关注名单存储 ==========
+        const FOCUS_KEY = 'chouBeiDaShi_focus';
+
+        // 读取关注名单（按 班级+课题 存储）
+        function loadFocusList(className, topic) {
+            try {
+                const data = localStorage.getItem(FOCUS_KEY);
+                const all = data ? JSON.parse(data) : {};
+                const key = className + '|' + topic;
+                return all[key] || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // 保存关注名单
+        function saveFocusList(className, topic, list) {
+            try {
+                const data = localStorage.getItem(FOCUS_KEY);
+                const all = data ? JSON.parse(data) : {};
+                const key = className + '|' + topic;
+                all[key] = list;
+                localStorage.setItem(FOCUS_KEY, JSON.stringify(all));
+            } catch (e) {
+                console.error('保存关注名单失败:', e);
+            }
         }
 
         // ========== 核心数据 ==========
@@ -1100,6 +1181,7 @@
 
             classTopicTitle.textContent = `${currentClass} - ${currentTopic}`;
             renderQuestionList();
+            renderFocusTags();
             showPage(waitingPage);
         });
 
@@ -1116,6 +1198,33 @@
                 questionItem.className = 'question-item';
                 questionItem.textContent = question;
                 questionListContainer.appendChild(questionItem);
+            });
+        }
+
+        // 渲染关注名单标签
+        function renderFocusTags() {
+            const container = document.getElementById('focusTags');
+            container.innerHTML = '';
+            const students = allClassStudents[currentClass] || [];
+            const focusList = loadFocusList(currentClass, currentTopic);
+
+            students.forEach(name => {
+                const tag = document.createElement('span');
+                tag.className = 'focus-tag' + (focusList.includes(name) ? ' focused' : '');
+                tag.textContent = name;
+                tag.addEventListener('click', () => {
+                    const list = loadFocusList(currentClass, currentTopic);
+                    const idx = list.indexOf(name);
+                    if (idx > -1) {
+                        list.splice(idx, 1);
+                        tag.classList.remove('focused');
+                    } else {
+                        list.push(name);
+                        tag.classList.add('focused');
+                    }
+                    saveFocusList(currentClass, currentTopic, list);
+                });
+                container.appendChild(tag);
             });
         }
 
@@ -1183,47 +1292,25 @@
             return array;
         }
 
-        // ========== 第3步：智能抽选模式 ==========
-        // 智能算法：计算每个学生的优先级分数
+        // ========== 智能抽选（关注名单优先） ==========
         function getSmartTarget(students) {
-            if (!storageAvailable || students.length === 0) {
-                // 不可用时随机选
-                return students[Math.floor(Math.random() * students.length)];
+            if (students.length === 0) {
+                return students[0];
             }
 
-            const records = loadRecords();
-            // 只看当前班级的记录
-            const classRecords = records.filter(r => r.className === currentClass);
+            // 读取关注名单
+            const focusList = loadFocusList(currentClass, currentTopic);
 
-            // 统计每个学生的被抽次数和通过次数
-            const stats = {};
-            students.forEach(s => {
-                stats[s] = { count: 0, passCount: 0 };
-            });
-            classRecords.forEach(r => {
-                if (stats[r.student] !== undefined) {
-                    stats[r.student].count++;
-                    if (r.result === 'pass') stats[r.student].passCount++;
-                }
-            });
+            // 关注名单中还没被抽到的学生
+            const focusRemaining = students.filter(s => focusList.includes(s));
 
-            // 排序：先按被抽次数升序，再按通过率升序
-            const sorted = [...students].sort((a, b) => {
-                const sa = stats[a], sb = stats[b];
-                // 被抽次数少的优先
-                if (sa.count !== sb.count) return sa.count - sb.count;
-                // 次数相同，通过率低的优先
-                const rateA = sa.count > 0 ? sa.passCount / sa.count : 0;
-                const rateB = sb.count > 0 ? sb.passCount / sb.count : 0;
-                if (rateA !== rateB) return rateA - rateB;
-                // 都相同则随机
-                return Math.random() - 0.5;
-            });
+            if (focusRemaining.length > 0) {
+                // 关注名单里还有人，从中随机抽
+                return focusRemaining[Math.floor(Math.random() * focusRemaining.length)];
+            }
 
-            // 取最优先的那几个中随机选一个（前20%，至少1个）
-            const topN = Math.max(1, Math.floor(sorted.length * 0.2));
-            const candidates = sorted.slice(0, topN);
-            return candidates[Math.floor(Math.random() * candidates.length)];
+            // 关注名单抽完了，从剩余学生中随机抽
+            return students[Math.floor(Math.random() * students.length)];
         }
 
         // 学生抽选逻辑
