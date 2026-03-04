@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.2.0</title>
+    <title>超级抽背大师 v2.2.1</title>
     <style>
         * {
             box-sizing: border-box;
@@ -229,115 +229,145 @@
         /* ===== 抽背页 ===== */
         #recitationPage {
             padding: 0;
-            flex-direction: row;
-            background: #f8fafc;
-        }
-
-        #recitationPage h1 {
-            display: none;
-        }
-
-        .recitation-layout {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        /* 左侧：问题区 */
-        .question-panel {
-            width: 50vw;
-            height: 100vh;
-            display: flex;
             flex-direction: column;
-            padding: 3vh 2.5vw;
-            background: #f8fafc;
-        }
-
-        .panel-title {
-            font-size: 1.6vw;
-            color: #94a3b8;
-            font-weight: 400;
-            margin-bottom: 2vh;
-            text-align: left;
-        }
-
-        .question-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1vh;
             justify-content: flex-start;
-            margin-bottom: 2vh;
+            background: #1e293b;
         }
 
-        .q-btn {
-            width: 6vh;
-            height: 6vh;
-            border-radius: 50%;
+        /* 顶栏 */
+        .recitation-topbar {
+            width: 100vw;
+            height: 8vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5vw;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+
+        .topbar-back {
+            background: #4f46e5;
+            color: white;
             border: none;
-            font-size: 2vh;
-            font-weight: 700;
+            border-radius: 50%;
+            width: 5vh;
+            height: 5vh;
+            font-size: 2.5vh;
             cursor: pointer;
-            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1;
+            flex-shrink: 0;
         }
 
-        .q-btn.available {
+        .topbar-back:active {
+            background: #3730a3;
+        }
+
+        .question-nav {
+            display: flex;
+            align-items: center;
+            gap: 2vw;
+        }
+
+        .nav-arrow {
+            background: none;
+            border: 2px solid #4f46e5;
+            color: #4f46e5;
+            border-radius: 50%;
+            width: 5vh;
+            height: 5vh;
+            font-size: 2vh;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .nav-arrow:hover {
             background: #4f46e5;
             color: white;
         }
 
-        .q-btn.available:active {
+        .nav-arrow:active {
             background: #3730a3;
-            transform: scale(0.95);
-        }
-
-        .q-btn.used {
-            background: #22c55e;
+            border-color: #3730a3;
             color: white;
         }
 
-        .question-display {
-            flex: 1;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 1.5vw;
-            padding: 3vh 2vw;
+        .nav-label {
+            font-size: 2.2vw;
+            font-weight: 700;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .question-dots {
+            display: flex;
+            align-items: center;
+            gap: 0.8vw;
+        }
+
+        .q-dot {
+            width: 1.6vh;
+            height: 1.6vh;
+            border-radius: 50%;
+            background: #4f46e5;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .q-dot.used {
+            background: #22c55e;
+        }
+
+        .q-dot.current {
+            box-shadow: 0 0 0 3px #f8fafc, 0 0 0 5px #4f46e5;
+        }
+
+        .q-dot.current.used {
+            box-shadow: 0 0 0 3px #f8fafc, 0 0 0 5px #22c55e;
+        }
+
+        /* 问题文字区 */
+        .question-text-area {
+            width: 100vw;
+            min-height: 20vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5vw;
-            line-height: 1.4;
-            text-align: center;
+            padding: 2vh 4vw;
+            background: white;
+            font-size: 3vw;
+            line-height: 1.5;
             font-weight: 700;
             color: #1e293b;
-            overflow-y: auto;
+            text-align: center;
+            flex-shrink: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .question-display.highlight {
-            animation: highlightQuestion 0.6s ease;
+        .question-text-area.switching {
+            animation: questionSwitch 0.4s ease;
         }
 
-        @keyframes highlightQuestion {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); background-color: #eef2ff; }
-            100% { transform: scale(1); }
+        @keyframes questionSwitch {
+            0% { opacity: 1; }
+            40% { opacity: 0; transform: translateY(-5px); }
+            60% { opacity: 0; transform: translateY(5px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-
-        /* 右侧：学生区 */
+        /* 学生区（全宽深色背景） */
         .student-panel {
-            width: 50vw;
-            height: 100vh;
+            width: 100vw;
+            flex: 1;
             display: flex;
             flex-direction: column;
             background: #1e293b;
-        }
-
-        .student-panel .panel-title {
-            color: #64748b;
-            padding: 3vh 2.5vw 0;
         }
 
         .student-display {
@@ -353,11 +383,18 @@
             letter-spacing: 0.1em;
         }
 
+        /* 按钮区 */
+        .button-area {
+            width: 100vw;
+            padding: 2vh 4vw 3vh;
+            background: #1e293b;
+            flex-shrink: 0;
+        }
+
         .control-buttons {
             display: flex;
             gap: 2vw;
             justify-content: center;
-            padding: 3vh 2.5vw;
         }
 
         .ctrl-btn {
@@ -412,7 +449,6 @@
             display: none;
             gap: 2vw;
             justify-content: center;
-            padding: 3vh 2.5vw;
         }
 
         .result-buttons .ctrl-btn {
@@ -493,36 +529,39 @@
 
     <!-- 第3页：抽背页 -->
     <div class="page" id="recitationPage">
-        <button class="back-btn" id="backToQuestionListBtn">←</button>
-        <h1 id="recitationTitle">高一8班 - 辩证法（上）</h1>
-
-        <div class="recitation-layout">
-            <!-- 左侧：问题区域 -->
-            <div class="question-panel">
-                <div class="panel-title">问题抽选</div>
-                <div class="question-buttons" id="questionButtons">
-                </div>
-                <div class="question-display" id="currentQuestionDisplay">
-                    请选择一个问题
-                </div>
+        <!-- 顶栏 -->
+        <div class="recitation-topbar">
+            <button class="topbar-back" id="backToQuestionListBtn">←</button>
+            <div class="question-nav">
+                <button class="nav-arrow" id="prevQuestionBtn">◀</button>
+                <span class="nav-label" id="questionNavLabel">第 1/9 题</span>
+                <button class="nav-arrow" id="nextQuestionBtn">▶</button>
             </div>
+            <div class="question-dots" id="questionDots"></div>
+        </div>
 
-            <!-- 右侧：学生区域 -->
-            <div class="student-panel">
-                <div class="panel-title">学生抽选</div>
-                <div class="student-display" id="studentDisplay">
-                    ?
-                    <span class="result-feedback" id="resultFeedback"></span>
-                </div>
+        <!-- 问题文字区 -->
+        <div class="question-text-area" id="questionTextArea">
+            请选择一个问题
+        </div>
 
-                <div class="control-buttons" id="controlButtons">
-                    <button class="ctrl-btn roll" id="rollBtn">抽选</button>
-                    <button class="ctrl-btn stop" id="stopBtn">停止</button>
-                </div>
-                <div class="result-buttons" id="resultButtons">
-                    <button class="ctrl-btn pass" id="passBtn">通过 ✓</button>
-                    <button class="ctrl-btn fail" id="failBtn">加油</button>
-                </div>
+        <!-- 学生大名字区 -->
+        <div class="student-panel">
+            <div class="student-display" id="studentDisplay">
+                ?
+                <span class="result-feedback" id="resultFeedback"></span>
+            </div>
+        </div>
+
+        <!-- 按钮区 -->
+        <div class="button-area">
+            <div class="control-buttons" id="controlButtons">
+                <button class="ctrl-btn roll" id="rollBtn">抽选</button>
+                <button class="ctrl-btn stop" id="stopBtn">停止</button>
+            </div>
+            <div class="result-buttons" id="resultButtons">
+                <button class="ctrl-btn pass" id="passBtn">通过 ✓</button>
+                <button class="ctrl-btn fail" id="failBtn">加油</button>
             </div>
         </div>
     </div>
@@ -708,6 +747,7 @@
         let lastSelectedQuestion = '';
         let lastSelectedStudent = '';
         let storageAvailable = false;
+        let currentQuestionIndex = 0; // 当前题号索引
 
         // ========== DOM元素 ==========
         const configPage = document.getElementById('configPage');
@@ -724,9 +764,11 @@
         const startRecitationBtn = document.getElementById('startRecitationBtn');
         const backToConfigBtn1 = document.getElementById('backToConfigBtn1');
 
-        const recitationTitle = document.getElementById('recitationTitle');
-        const questionButtons = document.getElementById('questionButtons');
-        const currentQuestionDisplay = document.getElementById('currentQuestionDisplay');
+        const questionTextArea = document.getElementById('questionTextArea');
+        const questionNavLabel = document.getElementById('questionNavLabel');
+        const questionDots = document.getElementById('questionDots');
+        const prevQuestionBtn = document.getElementById('prevQuestionBtn');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
         const studentDisplay = document.getElementById('studentDisplay');
         const rollBtn = document.getElementById('rollBtn');
         const stopBtn = document.getElementById('stopBtn');
@@ -815,11 +857,11 @@
 
         // ========== 候课页逻辑 ==========
         startRecitationBtn.addEventListener('click', () => {
-            recitationTitle.textContent = `${currentClass} - ${currentTopic}`;
-            renderQuestionButtons();
-            currentQuestionDisplay.textContent = '请选择一个问题';
+            currentQuestionIndex = 0;
+            usedQuestions = [];
+            renderQuestionDots();
+            selectQuestion(0);
             studentDisplay.childNodes[0].textContent = '?';
-            lastSelectedQuestion = '';
             lastSelectedStudent = '';
             controlButtons.style.display = 'flex';
             resultButtons.style.display = 'none';
@@ -831,35 +873,61 @@
         });
 
         // ========== 抽背页逻辑 ==========
-        function renderQuestionButtons() {
-            questionButtons.innerHTML = '';
-            currentQuestions.forEach((question, index) => {
-                const button = document.createElement('button');
-                button.className = 'q-btn available';
-                button.textContent = index + 1;
-                button.dataset.question = question;
 
-                button.addEventListener('click', () => {
-                    if (button.classList.contains('available')) {
-                        const questionText = question.replace(/^\d+\.\s/, '');
-                        currentQuestionDisplay.textContent = questionText;
-                        lastSelectedQuestion = questionText;
-                        currentQuestionDisplay.classList.add('highlight');
-                        speakText(`问题：${questionText}`);
-
-                        setTimeout(() => {
-                            currentQuestionDisplay.classList.remove('highlight');
-                        }, 1000);
-
-                        button.classList.remove('available');
-                        button.classList.add('used');
-                        usedQuestions.push(question);
-                    }
-                });
-
-                questionButtons.appendChild(button);
+        // 渲染题号小圆点
+        function renderQuestionDots() {
+            questionDots.innerHTML = '';
+            currentQuestions.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.className = 'q-dot';
+                if (usedQuestions.includes(currentQuestions[index])) {
+                    dot.classList.add('used');
+                }
+                if (index === currentQuestionIndex) {
+                    dot.classList.add('current');
+                }
+                dot.addEventListener('click', () => selectQuestion(index));
+                questionDots.appendChild(dot);
             });
         }
+
+        // 选中某道题
+        function selectQuestion(index) {
+            if (index < 0 || index >= currentQuestions.length) return;
+            currentQuestionIndex = index;
+            const question = currentQuestions[index];
+            const questionText = question.replace(/^\d+\.\s/, '');
+            questionTextArea.textContent = questionText;
+            lastSelectedQuestion = questionText;
+            questionNavLabel.textContent = `第 ${index + 1}/${currentQuestions.length} 题`;
+
+            // 标记已问过
+            if (!usedQuestions.includes(question)) {
+                usedQuestions.push(question);
+            }
+
+            // 切题动画
+            questionTextArea.classList.add('switching');
+            setTimeout(() => questionTextArea.classList.remove('switching'), 400);
+
+            renderQuestionDots();
+        }
+
+        // 上一题 / 下一题
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                selectQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                selectQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        prevQuestionBtn.addEventListener('click', prevQuestion);
+        nextQuestionBtn.addEventListener('click', nextQuestion);
 
         // ========== 智能抽选（关注名单优先） ==========
         function getSmartTarget(students) {
@@ -946,11 +1014,13 @@
                 setTimeout(() => {
                     resultFeedback.className = 'result-feedback';
                     resultFeedback.textContent = '';
+                    studentDisplay.childNodes[0].textContent = '?';
                     controlButtons.style.display = 'flex';
                     resultButtons.style.display = 'none';
                 }, 1500);
             } else {
                 // 不通过：不显示符号，静静回到抽选状态
+                studentDisplay.childNodes[0].textContent = '?';
                 controlButtons.style.display = 'flex';
                 resultButtons.style.display = 'none';
             }
