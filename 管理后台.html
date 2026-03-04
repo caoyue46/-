@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 · 管理后台 v2.1.0</title>
+    <title>超级抽背大师 · 管理后台 v2.2.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -467,6 +467,189 @@
             padding: 40px 0;
         }
 
+        /* ========== 数据管理页样式 ========== */
+        .nav-btn.data-manage {
+            background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+        }
+
+        .data-tabs {
+            display: flex;
+            gap: 0;
+            width: 100%;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .data-tab-btn {
+            flex: 1;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            margin-bottom: -2px;
+        }
+
+        .data-tab-btn.active {
+            color: #9c27b0;
+            border-bottom-color: #9c27b0;
+        }
+
+        .data-tab-btn:hover {
+            color: #9c27b0;
+        }
+
+        .data-tab-content {
+            display: none;
+            width: 100%;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .data-tab-content.active {
+            display: flex;
+            gap: 15px;
+        }
+
+        .data-list-panel {
+            width: 200px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .data-list-item {
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            font-size: 0.95rem;
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+
+        .data-list-item:hover {
+            border-color: #9c27b0;
+        }
+
+        .data-list-item.active {
+            background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+            color: white;
+            border-color: #9c27b0;
+            font-weight: bold;
+        }
+
+        .data-list-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 5px;
+        }
+
+        .data-list-actions button {
+            flex: 1;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            transition: all 0.15s ease;
+        }
+
+        .btn-add-item {
+            background: #9c27b0;
+        }
+
+        .btn-add-item:hover {
+            background: #7b1fa2;
+        }
+
+        .btn-del-item {
+            background: #f44336;
+        }
+
+        .btn-del-item:hover {
+            background: #d32f2f;
+        }
+
+        .data-edit-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .data-edit-panel textarea {
+            flex: 1;
+            min-height: 350px;
+            padding: 15px;
+            font-size: 1rem;
+            font-family: 'Microsoft YaHei', sans-serif;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        .data-edit-panel textarea:focus {
+            outline: none;
+            border-color: #9c27b0;
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.15);
+        }
+
+        .data-edit-hint {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .btn-save-data {
+            align-self: flex-start;
+            padding: 10px 30px;
+            font-size: 1rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .btn-save-data:hover {
+            transform: translateY(-2px);
+        }
+
+        .save-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .save-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         @media (max-width: 768px) {
             .container {
                 min-height: auto;
@@ -508,6 +691,7 @@
             <div class="nav-grid">
                 <button class="nav-btn dashboard" id="gotoDashboardBtn">学情看板</button>
                 <button class="nav-btn focus" id="gotoFocusBtn">关注名单</button>
+                <button class="nav-btn data-manage" id="gotoDataManageBtn">数据管理</button>
             </div>
         </div>
 
@@ -520,10 +704,6 @@
                 <div class="dashboard-controls">
                     <select id="dashboardClassFilter" class="dashboard-select">
                         <option value="all">全部班级</option>
-                        <option value="高一8班">高一8班</option>
-                        <option value="高一12班">高一12班</option>
-                        <option value="高一16班">高一16班</option>
-                        <option value="高一20班">高一20班</option>
                     </select>
                     <button class="btn-export" id="exportCsvBtn">导出CSV</button>
                     <button class="btn-clear-data" id="clearDataBtn">清空数据</button>
@@ -548,21 +728,8 @@
             <p style="color: #999; margin-bottom: 1rem;">选择班级和课题，点击学生姓名设为关注（橙色 = 已关注）</p>
 
             <div class="focus-config">
-                <select id="focusClassSelect" class="focus-select">
-                    <option value="高一8班" selected>高一8班</option>
-                    <option value="高一12班">高一12班</option>
-                    <option value="高一16班">高一16班</option>
-                    <option value="高一20班">高一20班</option>
-                </select>
-                <select id="focusTopicSelect" class="focus-select">
-                    <option value="导论（时代精神的精华）">导论（时代精神的精华）</option>
-                    <option value="唯物论">唯物论</option>
-                    <option value="辩证法（上）" selected>辩证法（上）</option>
-                    <option value="辩证法（下）">辩证法（下）</option>
-                    <option value="认识论">认识论</option>
-                    <option value="历史唯物主义">历史唯物主义</option>
-                    <option value="实现人生的价值">实现人生的价值</option>
-                </select>
+                <select id="focusClassSelect" class="focus-select"></select>
+                <select id="focusTopicSelect" class="focus-select"></select>
             </div>
 
             <div class="focus-count" id="focusCount">已关注：0 人</div>
@@ -573,12 +740,61 @@
                 <button class="btn-small clear" id="clearFocusBtn">清空本组</button>
             </div>
         </div>
+
+        <!-- 数据管理页 -->
+        <div class="page" id="dataManagePage">
+            <button class="back-btn" id="backFromDataManage">←</button>
+            <h2>数据管理</h2>
+            <p style="color: #999; margin-bottom: 1rem;">编辑班级名单和课题问题，保存后教室版自动生效</p>
+
+            <div class="data-tabs">
+                <button class="data-tab-btn active" data-dtab="studentsTab">班级名单</button>
+                <button class="data-tab-btn" data-dtab="topicsTab">课题问题</button>
+            </div>
+
+            <!-- 班级名单标签 -->
+            <div class="data-tab-content active" id="studentsTab">
+                <div class="data-list-panel">
+                    <div id="classListItems"></div>
+                    <div class="data-list-actions">
+                        <button class="btn-add-item" id="addClassBtn">+ 新增</button>
+                        <button class="btn-del-item" id="delClassBtn">- 删除</button>
+                    </div>
+                </div>
+                <div class="data-edit-panel">
+                    <div class="data-edit-hint">一行一个学生姓名，可从 Excel 直接粘贴</div>
+                    <textarea id="studentsTextarea" placeholder="请先在左侧选择一个班级"></textarea>
+                    <button class="btn-save-data" id="saveStudentsBtn">保存名单</button>
+                </div>
+            </div>
+
+            <!-- 课题问题标签 -->
+            <div class="data-tab-content" id="topicsTab">
+                <div class="data-list-panel">
+                    <div id="topicListItems"></div>
+                    <div class="data-list-actions">
+                        <button class="btn-add-item" id="addTopicBtn">+ 新增</button>
+                        <button class="btn-del-item" id="delTopicBtn">- 删除</button>
+                    </div>
+                </div>
+                <div class="data-edit-panel">
+                    <div class="data-edit-hint">一行一个问题，保存时自动去除空行</div>
+                    <textarea id="topicsTextarea" placeholder="请先在左侧选择一个课题"></textarea>
+                    <button class="btn-save-data" id="saveTopicsBtn">保存问题</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 保存提示 -->
+        <div class="save-toast" id="saveToast">保存成功</div>
     </div>
 
     <script>
         // ========== 数据层（与教室版共享同一 localStorage） ==========
         const STORAGE_KEY = 'chouBeiDaShi_records';
         const FOCUS_KEY = 'chouBeiDaShi_focus';
+        const STUDENTS_KEY = 'chouBeiDaShi_students';
+        const TOPICS_KEY = 'chouBeiDaShi_topics';
 
         function loadRecords() {
             try {
@@ -620,13 +836,118 @@
             }
         }
 
-        // ========== 学生数据（与教室版一致） ==========
-        const allClassStudents = {
+        // ========== 默认数据（与教室版一致） ==========
+        const defaultStudents = {
             "高一8班": ["王雨诺", "马樱萁", "颜秉泽", "朱政宇", "苏宇昂", "任乐意", "涂皓然", "许斯源", "刘浩然", "金轩宇", "王子旭", "方可尧", "孙文康", "张凌菲", "潘宝洋", "宋沐涵", "印子轩", "陈乃煌", "许其乐", "刘耕图", "孙笑笑", "韩耀东", "潘奕凯", "曹博", "苗文壮", "王诗俊", "王芸轩", "梁皓然", "张冉", "冯靖茹", "王文瑄", "刘佳鑫", "李昱辰", "陈俊艺", "葛建君", "赵仁杰", "李欣泽", "王安贤", "王冬", "邱子航", "王钰涵", "胡宇翔", "黄友乐", "李笑", "胡俊杰", "薛雅文", "孙畅", "崔毓轩", "顾涵博", "高梓茗", "于淳溪"],
             "高一12班": ["倪梓赫", "张文豪", "朱姯耀", "穆威竹", "方添瑞", "刘昱辰", "王雨欣", "陈永翔", "张梓墨", "周诗雅", "田思涵", "李牧纯", "赵志烜", "郭茜蕊", "卞思辰", "卞一棱", "王姝珩", "刘语梵", "孙艺齐", "仲子茹", "林贝格", "龙威邑", "姜婧雯", "田金苗", "李梦洁", "杨滨如", "章馨月", "赵婉琪", "葛小朵", "张芸菲", "张书涵", "马君涵", "温佳蓉", "于清涵", "胡一凡", "王熠楷", "班瑞欣", "陈炳瑀"],
             "高一16班": ["张冉佳", "陈欣妍", "刘耘珲", "朱芮娴", "侍津宇", "刘奕彤", "李依依", "万庆庆", "黄彦璋", "罗福山", "王谱霖", "蒋可睿", "吴思汶", "李语哲", "龚乙涵", "陈诗文", "吴承俊", "封思羽", "丁雅文", "王梓安", "刘浩宇", "窦星宇", "钱诗琦", "蒋沁言", "王怀博", "支禹泽", "李蕙妤", "徐鸣蔚", "范子萱", "唐煜杰", "张博", "陆熙哲", "刘婧", "李玉婷", "张圆圆", "王昱琦", "李语汐", "武楚涵", "仲新悦", "徐国方", "高煜然", "刘皓博", "王一哲", "徐新权", "王雨馨", "孙凡淼", "周思彤", "谢明辰", "王浩宇", "王山林", "乔煜卿", "李晓玲", "郭骐瑞", "朱祖贤"],
             "高一20班": ["陈鹏", "刘前隆", "李国豪", "徐延谋", "闫晨浩", "立芸溪", "王溪源", "陶宣霖", "王嘉洋", "屠曦菡", "孙华阳", "霍云飞", "徐恺圻", "相俊宇", "许刚源", "刘宸宇", "庄士晏", "黄楚淇", "范芷含", "姜庆媛", "孙晟益", "谢林都", "邱睿喆", "刘加一", "高浩然", "李尚燃", "仲玟", "李昀键", "李光峰", "封润芝", "马浩然", "张炜翔", "茆珺彦", "李卓洋", "赵浩然", "李同川", "孙浩然", "张振涵", "江祥文", "王子阳", "李瑶", "钱一举", "何祉衡", "夏启哲", "颜秉轩", "鲍锦鹏", "王露翔", "张歆瑶", "曹艺馨", "徐梓航", "黄继民", "刘凡铭", "刘奕铭", "贾瀚翔", "闫智杰", "于济恺", "曾泓玮", "刘权庆"]
         };
+
+        const defaultTopics = {
+            "导论（时代精神的精华）": [
+                "1. 哲学与世界观、方法论的关系",
+                "2. 哲学与具体科学的关系",
+                "3. 哲学的基本问题",
+                "4. 唯物主义和唯心主义的基本观点、基本形态",
+                "5. 哲学史上的\u201c两个对子\u201d、两大阵营",
+                "6. 马克思主义哲学的核心观点",
+                "7. 马克思主义中国化时代化的重大理论成果"
+            ],
+            "唯物论": [
+                "1. 物质的含义、唯一特性、固有的根本属性和存在方式",
+                "2. 意识是【人脑/大脑】的机能，【有/无】正误；内容【主观/客观】，形式【主观/客观】",
+                "3. 物质和意识是相互依赖吗？",
+                "4. 只谈物质忽视运动犯什么错？只谈运动忽视物质又犯什么错？",
+                "5. 什么是规律？能\u201c创造\u201d或\u201c消灭\u201d规律吗？ ",
+                "6. 正确发挥主观能动性的前提"
+            ],
+            "辩证法（上）": [
+                "1. 唯物辩证法的总特征、根本观点、实质和核心",
+                "2. 判断：a.任何两个事物之间都存在着联系b.人们可以根据需求建立新的联系",
+                "3. 什么是自在事物的联系？什么是人为事物的联系？他们是主观还是客观？",
+                "4. 【整体/部分】居于主导地位，立足【整体/部分】",
+                "5. 发展的实质（发展和运动、变化一样吗？）",
+                "6. 新旧事物的判断标准（区分：新事物、新出现的事物）",
+                "7. 发展的形式或状态（\u201c量变必然导致质变\u201d对吗？）",
+                "8. 辩证的否定的实质",
+                "9. 事物发展的前途、道路"
+            ],
+            "辩证法（下）": [
+                "1. 事物发展的源泉和动力是什么？",
+                "2. 矛盾的含义、基本属性",
+                "3. 【斗争性/同一性】寓于【斗争性/同一性】之中P61；【普遍性/特殊性】寓于【普遍性/特殊性】之中",
+                "4. 坚持唯物辩证法的前提",
+                "5. 矛盾问题的精髓",
+                "6. 什么对事物发展起决定作用？什么决定事物的性质？",
+                "7. 区别：主次矛、矛主次",
+                "8. 什么是\u201c马克思主义活的灵魂\u201d？正确认识事物的基础？解决矛盾的关键？",
+                "9. 唯物辩证法与形而上学对立的焦点和根本分歧"
+            ],
+            "认识论": [
+                "1. 感性认识与理性认识的关系",
+                "2. 什么是直接现实性？谁有？",
+                "3. 实践的三个特点",
+                "4. 获得认识的来源有几个？途径呢？",
+                "5. 【原理与方法论】实践与认识的辩证关系",
+                "6. 真理的含义、最基本属性、数量，内容【主观/客观】，形式【主观/客观】",
+                "7. 判断正误：a.真理和谬误相互包含b.真理是放之四海皆准的c.真理可以被超越、否定、推翻 ",
+                "8. 认识是怎么上升的？"
+            ],
+            "历史唯物主义": [
+                "1. 历史观的基本问题",
+                "2. 社会意识与社会存在同步吗？能促进社会发展吗？能起决定作用吗？",
+                "3. 【原理与方法论】社会存在与社会意识的辩证关系",
+                "4. 人类社会存在和发展的基础",
+                "5. 什么决定着社会的性质和面貌？决定着社会形态的更替？",
+                "6. 生产力、生产关系的基本要素",
+                "7. 社会历史发展的规律",
+                "8. 人类社会的基本矛盾",
+                "9. 社会发展的总趋势、过程",
+                "10. 社会发展的根本动力、直接动力",
+                "11. 改革的根本目的、作用",
+                "12. 人民群众的含义、地位、作用",
+                "13. 群众观点和群众路线的基本内容、地位"
+            ],
+            "实现人生的价值": [
+                "1. 评价一个人的最根本标准",
+                "2. 价值观有正误之分吗？都能起促进作用吗？能起决定作用吗？",
+                "3. 社会主义核心价值观的基本内容、层面",
+                "4. 价值判断和价值选择的关系？均源于什么？",
+                "5. 价值判断和价值选择的判断标准（最高的？）",
+                "6. 创造和实现人生价值的前提",
+                "7. 人生价值的创造与实现"
+            ]
+        };
+
+        // 优先读 localStorage，没有则用默认值
+        function getStudents() {
+            try {
+                const data = localStorage.getItem(STUDENTS_KEY);
+                if (data) return JSON.parse(data);
+            } catch(e) {}
+            return defaultStudents;
+        }
+
+        function getTopics() {
+            try {
+                const data = localStorage.getItem(TOPICS_KEY);
+                if (data) return JSON.parse(data);
+            } catch(e) {}
+            return defaultTopics;
+        }
+
+        function saveStudents(data) {
+            localStorage.setItem(STUDENTS_KEY, JSON.stringify(data));
+        }
+
+        function saveTopicsData(data) {
+            localStorage.setItem(TOPICS_KEY, JSON.stringify(data));
+        }
+
+        // 当前使用的数据
+        let allClassStudents = getStudents();
+        let allTopicQuestions = getTopics();
 
         // ========== 页面切换 ==========
         function showPage(page) {
@@ -637,6 +958,43 @@
         const homePage = document.getElementById('homePage');
         const dashboardPage = document.getElementById('dashboardPage');
         const focusPage = document.getElementById('focusPage');
+        const dataManagePage = document.getElementById('dataManagePage');
+
+        // 动态填充下拉框
+        function populateAllSelects() {
+            const students = getStudents();
+            const topics = getTopics();
+
+            // 学情看板-班级筛选
+            const dashFilter = document.getElementById('dashboardClassFilter');
+            // 保留"全部班级"，清除后面的
+            while (dashFilter.options.length > 1) dashFilter.remove(1);
+            Object.keys(students).forEach(cls => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                dashFilter.appendChild(opt);
+            });
+
+            // 关注名单-班级和课题
+            const fClassSel = document.getElementById('focusClassSelect');
+            const fTopicSel = document.getElementById('focusTopicSelect');
+            fClassSel.innerHTML = '';
+            fTopicSel.innerHTML = '';
+            Object.keys(students).forEach(cls => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                fClassSel.appendChild(opt);
+            });
+            Object.keys(topics).forEach(topic => {
+                const opt = document.createElement('option');
+                opt.value = topic;
+                opt.textContent = topic;
+                fTopicSel.appendChild(opt);
+            });
+        }
+        populateAllSelects();
 
         // 导航
         document.getElementById('gotoDashboardBtn').addEventListener('click', () => {
@@ -649,9 +1007,21 @@
             showPage(focusPage);
         });
 
+        document.getElementById('gotoDataManageBtn').addEventListener('click', () => {
+            initDataManage();
+            showPage(dataManagePage);
+        });
+
         // 返回按钮
         document.getElementById('backFromDashboard').addEventListener('click', () => showPage(homePage));
         document.getElementById('backFromFocus').addEventListener('click', () => showPage(homePage));
+        document.getElementById('backFromDataManage').addEventListener('click', () => {
+            // 返回时刷新数据（可能有改动）
+            allClassStudents = getStudents();
+            allTopicQuestions = getTopics();
+            populateAllSelects();
+            showPage(homePage);
+        });
 
         // ========== 关注名单管理 ==========
         const focusClassSelect = document.getElementById('focusClassSelect');
@@ -668,7 +1038,8 @@
             const container = document.getElementById('focusTags');
             container.innerHTML = '';
 
-            const students = allClassStudents[cls] || [];
+            const studentsData = getStudents();
+            const students = studentsData[cls] || [];
             const focusList = loadFocusList(cls, topic);
 
             students.forEach(name => {
@@ -944,6 +1315,192 @@
                     alert('数据已清空');
                 }
             }
+        });
+
+        // ========== 数据管理 ==========
+        let dmCurrentClass = null;  // 当前选中的班级名
+        let dmCurrentTopic = null;  // 当前选中的课题名
+
+        // 数据管理标签切换
+        document.querySelectorAll('.data-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.data-tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.data-tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.dtab).classList.add('active');
+            });
+        });
+
+        // 提示 toast
+        function showToast(msg) {
+            const toast = document.getElementById('saveToast');
+            toast.textContent = msg || '保存成功';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1500);
+        }
+
+        // 初始化数据管理页
+        function initDataManage() {
+            dmCurrentClass = null;
+            dmCurrentTopic = null;
+            renderClassList();
+            renderTopicList();
+            document.getElementById('studentsTextarea').value = '';
+            document.getElementById('topicsTextarea').value = '';
+        }
+
+        // ---- 班级名单 ----
+        function renderClassList() {
+            const data = getStudents();
+            const container = document.getElementById('classListItems');
+            container.innerHTML = '';
+            Object.keys(data).forEach(cls => {
+                const item = document.createElement('div');
+                item.className = 'data-list-item' + (cls === dmCurrentClass ? ' active' : '');
+                item.textContent = cls;
+                item.addEventListener('click', () => {
+                    dmCurrentClass = cls;
+                    renderClassList();
+                    loadClassToTextarea(cls);
+                });
+                container.appendChild(item);
+            });
+        }
+
+        function loadClassToTextarea(cls) {
+            const data = getStudents();
+            const students = data[cls] || [];
+            document.getElementById('studentsTextarea').value = students.join('\n');
+        }
+
+        // 保存班级名单
+        document.getElementById('saveStudentsBtn').addEventListener('click', () => {
+            if (!dmCurrentClass) {
+                alert('请先在左侧选择一个班级');
+                return;
+            }
+            const text = document.getElementById('studentsTextarea').value;
+            const names = text.split('\n')
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+            const data = getStudents();
+            data[dmCurrentClass] = names;
+            saveStudents(data);
+            allClassStudents = data;
+            showToast(`${dmCurrentClass}：${names.length} 人已保存`);
+        });
+
+        // 新增班级
+        document.getElementById('addClassBtn').addEventListener('click', () => {
+            const name = prompt('请输入新班级名称：');
+            if (!name || !name.trim()) return;
+            const cls = name.trim();
+            const data = getStudents();
+            if (data[cls]) {
+                alert('该班级已存在');
+                return;
+            }
+            data[cls] = [];
+            saveStudents(data);
+            allClassStudents = data;
+            dmCurrentClass = cls;
+            renderClassList();
+            loadClassToTextarea(cls);
+            showToast(`已新增班级：${cls}`);
+        });
+
+        // 删除班级
+        document.getElementById('delClassBtn').addEventListener('click', () => {
+            if (!dmCurrentClass) {
+                alert('请先选择要删除的班级');
+                return;
+            }
+            if (!confirm(`确定删除「${dmCurrentClass}」及其全部学生名单？`)) return;
+            const data = getStudents();
+            delete data[dmCurrentClass];
+            saveStudents(data);
+            allClassStudents = data;
+            dmCurrentClass = null;
+            renderClassList();
+            document.getElementById('studentsTextarea').value = '';
+            showToast('班级已删除');
+        });
+
+        // ---- 课题问题 ----
+        function renderTopicList() {
+            const data = getTopics();
+            const container = document.getElementById('topicListItems');
+            container.innerHTML = '';
+            Object.keys(data).forEach(topic => {
+                const item = document.createElement('div');
+                item.className = 'data-list-item' + (topic === dmCurrentTopic ? ' active' : '');
+                item.textContent = topic;
+                item.addEventListener('click', () => {
+                    dmCurrentTopic = topic;
+                    renderTopicList();
+                    loadTopicToTextarea(topic);
+                });
+                container.appendChild(item);
+            });
+        }
+
+        function loadTopicToTextarea(topic) {
+            const data = getTopics();
+            const questions = data[topic] || [];
+            document.getElementById('topicsTextarea').value = questions.join('\n');
+        }
+
+        // 保存课题问题
+        document.getElementById('saveTopicsBtn').addEventListener('click', () => {
+            if (!dmCurrentTopic) {
+                alert('请先在左侧选择一个课题');
+                return;
+            }
+            const text = document.getElementById('topicsTextarea').value;
+            const questions = text.split('\n')
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+            const data = getTopics();
+            data[dmCurrentTopic] = questions;
+            saveTopicsData(data);
+            allTopicQuestions = data;
+            showToast(`${dmCurrentTopic}：${questions.length} 题已保存`);
+        });
+
+        // 新增课题
+        document.getElementById('addTopicBtn').addEventListener('click', () => {
+            const name = prompt('请输入新课题名称：');
+            if (!name || !name.trim()) return;
+            const topic = name.trim();
+            const data = getTopics();
+            if (data[topic]) {
+                alert('该课题已存在');
+                return;
+            }
+            data[topic] = [];
+            saveTopicsData(data);
+            allTopicQuestions = data;
+            dmCurrentTopic = topic;
+            renderTopicList();
+            loadTopicToTextarea(topic);
+            showToast(`已新增课题：${topic}`);
+        });
+
+        // 删除课题
+        document.getElementById('delTopicBtn').addEventListener('click', () => {
+            if (!dmCurrentTopic) {
+                alert('请先选择要删除的课题');
+                return;
+            }
+            if (!confirm(`确定删除「${dmCurrentTopic}」及其全部问题？`)) return;
+            const data = getTopics();
+            delete data[dmCurrentTopic];
+            saveTopicsData(data);
+            allTopicQuestions = data;
+            dmCurrentTopic = null;
+            renderTopicList();
+            document.getElementById('topicsTextarea').value = '';
+            showToast('课题已删除');
         });
     </script>
 </body>

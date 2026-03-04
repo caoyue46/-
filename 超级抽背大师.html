@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.1.2</title>
+    <title>超级抽背大师 v2.2.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -463,10 +463,6 @@
                 <div class="config-label">班级</div>
                 <select id="classSelect" class="config-select">
                     <option value="">--请选择--</option>
-                    <option value="高一8班" selected>高一8班</option>
-                    <option value="高一12班">高一12班</option>
-                    <option value="高一16班">高一16班</option>
-                    <option value="高一20班">高一20班</option>
                 </select>
             </div>
 
@@ -474,13 +470,6 @@
                 <div class="config-label">课题</div>
                 <select id="topicSelect" class="config-select">
                     <option value="">--请选择--</option>
-                    <option value="导论（时代精神的精华）">导论（时代精神的精华）</option>
-                    <option value="唯物论">唯物论</option>
-                    <option value="辩证法（上）" selected>辩证法（上）</option>
-                    <option value="辩证法（下）">辩证法（下）</option>
-                    <option value="认识论">认识论</option>
-                    <option value="历史唯物主义">历史唯物主义</option>
-                    <option value="实现人生的价值">实现人生的价值</option>
                 </select>
             </div>
         </div>
@@ -600,15 +589,18 @@
             }
         }
 
-        // ========== 核心数据 ==========
-        const allClassStudents = {
+        // ========== 核心数据（默认值 + localStorage 读取） ==========
+        const STUDENTS_KEY = 'chouBeiDaShi_students';
+        const TOPICS_KEY = 'chouBeiDaShi_topics';
+
+        const defaultStudents = {
             "高一8班": ["王雨诺", "马樱萁", "颜秉泽", "朱政宇", "苏宇昂", "任乐意", "涂皓然", "许斯源", "刘浩然", "金轩宇", "王子旭", "方可尧", "孙文康", "张凌菲", "潘宝洋", "宋沐涵", "印子轩", "陈乃煌", "许其乐", "刘耕图", "孙笑笑", "韩耀东", "潘奕凯", "曹博", "苗文壮", "王诗俊", "王芸轩", "梁皓然", "张冉", "冯靖茹", "王文瑄", "刘佳鑫", "李昱辰", "陈俊艺", "葛建君", "赵仁杰", "李欣泽", "王安贤", "王冬", "邱子航", "王钰涵", "胡宇翔", "黄友乐", "李笑", "胡俊杰", "薛雅文", "孙畅", "崔毓轩", "顾涵博", "高梓茗", "于淳溪"],
             "高一12班": ["倪梓赫", "张文豪", "朱姯耀", "穆威竹", "方添瑞", "刘昱辰", "王雨欣", "陈永翔", "张梓墨", "周诗雅", "田思涵", "李牧纯", "赵志烜", "郭茜蕊", "卞思辰", "卞一棱", "王姝珩", "刘语梵", "孙艺齐", "仲子茹", "林贝格", "龙威邑", "姜婧雯", "田金苗", "李梦洁", "杨滨如", "章馨月", "赵婉琪", "葛小朵", "张芸菲", "张书涵", "马君涵", "温佳蓉", "于清涵", "胡一凡", "王熠楷", "班瑞欣", "陈炳瑀"],
             "高一16班": ["张冉佳", "陈欣妍", "刘耘珲", "朱芮娴", "侍津宇", "刘奕彤", "李依依", "万庆庆", "黄彦璋", "罗福山", "王谱霖", "蒋可睿", "吴思汶", "李语哲", "龚乙涵", "陈诗文", "吴承俊", "封思羽", "丁雅文", "王梓安", "刘浩宇", "窦星宇", "钱诗琦", "蒋沁言", "王怀博", "支禹泽", "李蕙妤", "徐鸣蔚", "范子萱", "唐煜杰", "张博", "陆熙哲", "刘婧", "李玉婷", "张圆圆", "王昱琦", "李语汐", "武楚涵", "仲新悦", "徐国方", "高煜然", "刘皓博", "王一哲", "徐新权", "王雨馨", "孙凡淼", "周思彤", "谢明辰", "王浩宇", "王山林", "乔煜卿", "李晓玲", "郭骐瑞", "朱祖贤"],
             "高一20班": ["陈鹏", "刘前隆", "李国豪", "徐延谋", "闫晨浩", "立芸溪", "王溪源", "陶宣霖", "王嘉洋", "屠曦菡", "孙华阳", "霍云飞", "徐恺圻", "相俊宇", "许刚源", "刘宸宇", "庄士晏", "黄楚淇", "范芷含", "姜庆媛", "孙晟益", "谢林都", "邱睿喆", "刘加一", "高浩然", "李尚燃", "仲玟", "李昀键", "李光峰", "封润芝", "马浩然", "张炜翔", "茆珺彦", "李卓洋", "赵浩然", "李同川", "孙浩然", "张振涵", "江祥文", "王子阳", "李瑶", "钱一举", "何祉衡", "夏启哲", "颜秉轩", "鲍锦鹏", "王露翔", "张歆瑶", "曹艺馨", "徐梓航", "黄继民", "刘凡铭", "刘奕铭", "贾瀚翔", "闫智杰", "于济恺", "曾泓玮", "刘权庆"]
         };
 
-        const topicQuestions = {
+        const defaultTopics = {
             "导论（时代精神的精华）": [
                 "1. 哲学与世界观、方法论的关系",
                 "2. 哲学与具体科学的关系",
@@ -684,6 +676,27 @@
             ]
         };
 
+        // 优先读 localStorage，没有则用默认值
+        function getStudents() {
+            try {
+                const data = localStorage.getItem(STUDENTS_KEY);
+                if (data) return JSON.parse(data);
+            } catch(e) {}
+            return defaultStudents;
+        }
+
+        function getTopics() {
+            try {
+                const data = localStorage.getItem(TOPICS_KEY);
+                if (data) return JSON.parse(data);
+            } catch(e) {}
+            return defaultTopics;
+        }
+
+        // 当前实际使用的数据（每次从数据源读取最新）
+        const allClassStudents = getStudents();
+        const topicQuestions = getTopics();
+
         // ========== 状态变量 ==========
         let currentClass = "高一8班";
         let currentTopic = "辩证法（上）";
@@ -724,9 +737,27 @@
         const failBtn = document.getElementById('failBtn');
         const resultFeedback = document.getElementById('resultFeedback');
 
-        // ========== 初始化 ==========
-        classSelect.value = currentClass;
-        topicSelect.value = currentTopic;
+        // ========== 初始化下拉框 ==========
+        function populateSelects() {
+            // 填充班级下拉框
+            Object.keys(allClassStudents).forEach(cls => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                classSelect.appendChild(opt);
+            });
+            // 填充课题下拉框
+            Object.keys(topicQuestions).forEach(topic => {
+                const opt = document.createElement('option');
+                opt.value = topic;
+                opt.textContent = topic;
+                topicSelect.appendChild(opt);
+            });
+            // 设置默认选中
+            if (allClassStudents[currentClass]) classSelect.value = currentClass;
+            if (topicQuestions[currentTopic]) topicSelect.value = currentTopic;
+        }
+        populateSelects();
 
         const synth = window.speechSynthesis;
 
