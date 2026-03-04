@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.1.0</title>
+    <title>超级抽背大师 v2.1.2</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,46 +12,34 @@
         }
 
         body {
-            font-family: 'Microsoft YaHei', sans-serif;
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
             text-align: center;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #333;
-            min-height: 100vh;
+            background: #1e293b;
+            color: #1e293b;
             margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .container {
-            width: 1000px;
-            height: 750px;
-            max-width: 95%;
-            max-height: 90vh;
-            position: relative;
-        }
-
+        /* ===== 页面通用 ===== */
         .page {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100vw;
+            height: 100vh;
+            background: #f8fafc;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             transition: opacity 0.4s ease, transform 0.4s ease;
             opacity: 0;
             transform: translateY(20px);
             pointer-events: none;
+            padding: 3vh 4vw;
         }
 
         .page.active {
@@ -61,261 +49,374 @@
             z-index: 10;
         }
 
-        .header {
-            margin-bottom: 1rem;
+        /* ===== 配置页 ===== */
+        #configPage {
+            gap: 4vh;
         }
 
-        h1 {
-            font-size: 2.2rem;
-            color: #2575fc;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            color: #6a11cb;
-            margin-bottom: 1.5rem;
+        #configPage h1 {
+            font-size: 3vw;
+            color: #4f46e5;
+            font-weight: 700;
+            letter-spacing: 0.1em;
         }
 
         .config-grid {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 3vh;
+            width: 40vw;
+        }
+
+        .config-item {
+            display: flex;
             align-items: center;
-            margin-bottom: 2rem;
-            width: 100%;
-            max-width: 500px;
+            gap: 2vw;
         }
 
         .config-label {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #6a11cb;
-            text-align: right;
+            font-size: 2vw;
+            font-weight: 600;
+            color: #4f46e5;
+            white-space: nowrap;
         }
 
         .config-select {
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            border-radius: 10px;
-            border: 2px solid #6a11cb;
-            background-color: white;
-            color: #333;
+            flex: 1;
+            padding: 1.5vh 2vw;
+            font-size: 1.8vw;
+            border-radius: 1vw;
+            border: 2px solid #c7d2fe;
+            background: white;
+            color: #1e293b;
             cursor: pointer;
-            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1vw center;
+            background-size: 2vw;
+        }
+
+        .config-select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff9e6b 100%);
+            background: #4f46e5;
             color: white;
-            padding: 14px 50px;
-            font-size: 1.4rem;
-            border-radius: 50px;
+            padding: 2vh 6vw;
+            font-size: 2vw;
+            border-radius: 1vw;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            font-weight: bold;
-            margin-top: 1rem;
+            font-weight: 700;
+            transition: background 0.2s ease;
+            min-height: 8vh;
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            background: #4338ca;
+        }
+
+        .btn-primary:active {
+            background: #3730a3;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 1.6vw;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* ===== 候课页 ===== */
+        #waitingPage {
+            justify-content: flex-start;
+            padding: 3vh 5vw;
+        }
+
+        #waitingPage .header {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 2vh;
+            padding-left: 5vw;
+        }
+
+        #waitingPage h1 {
+            font-size: 2.5vw;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        #waitingPage h2 {
+            font-size: 1.8vw;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-top: 0.5vh;
         }
 
         .question-list {
-            width: 100%;
-            flex-grow: 1;
+            width: 90vw;
+            flex: 1;
             overflow-y: auto;
             text-align: left;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            margin-bottom: 1.5rem;
+            padding: 2vh 3vw;
+            background: white;
+            border-radius: 1.5vw;
+            margin-bottom: 2vh;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
         .question-item {
-            margin: 10px 0;
-            padding: 12px 15px;
-            border-left: 4px solid #6a11cb;
-            background-color: rgba(106, 17, 203, 0.05);
-            border-radius: 5px;
-            font-size: 1.3rem;
+            padding: 1.5vh 2vw;
+            border-left: 0.4vw solid #4f46e5;
+            margin-bottom: 1.2vh;
+            font-size: 2.2vw;
             line-height: 1.5;
+            color: #1e293b;
+            background: #f8fafc;
+            border-radius: 0 0.5vw 0.5vw 0;
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: #4f46e5;
             color: white;
-            padding: 12px 40px;
-            font-size: 1.3rem;
-            border-radius: 50px;
+            padding: 2vh 6vw;
+            font-size: 2vw;
+            border-radius: 1vw;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            font-weight: bold;
+            font-weight: 700;
+            transition: background 0.2s ease;
+            min-height: 8vh;
+            margin-bottom: 1vh;
         }
 
         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+            background: #4338ca;
+        }
+
+        .btn-secondary:active {
+            background: #3730a3;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 2vh;
+            left: 2vw;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 5vh;
+            height: 5vh;
+            font-size: 2.5vh;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .back-btn:active {
+            background: #3730a3;
+        }
+
+        /* ===== 抽背页 ===== */
+        #recitationPage {
+            padding: 0;
+            flex-direction: row;
+            background: #f8fafc;
+        }
+
+        #recitationPage h1 {
+            display: none;
         }
 
         .recitation-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            width: 100%;
-            height: 100%;
+            display: flex;
+            width: 100vw;
+            height: 100vh;
         }
 
-        .question-panel, .student-panel {
+        /* 左侧：问题区 */
+        .question-panel {
+            width: 50vw;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            padding: 3vh 2.5vw;
+            background: #f8fafc;
         }
 
         .panel-title {
-            font-size: 1.5rem;
-            color: #6a11cb;
-            font-weight: bold;
-            margin-bottom: 15px;
+            font-size: 1.6vw;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-bottom: 2vh;
+            text-align: left;
         }
 
         .question-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 20px;
+            gap: 1vh;
+            justify-content: flex-start;
+            margin-bottom: 2vh;
         }
 
         .q-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 6vh;
+            height: 6vh;
+            border-radius: 50%;
             border: none;
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 2vh;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .q-btn.available {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: #4f46e5;
             color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .q-btn.available:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        .q-btn.available:active {
+            background: #3730a3;
+            transform: scale(0.95);
         }
 
         .q-btn.used {
-            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            background: #22c55e;
             color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .q-btn.used:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
 
         .question-display {
-            flex-grow: 1;
-            background: #f8f9fa;
-            border: 2px solid #6a11cb;
-            border-radius: 15px;
-            padding: 20px;
+            flex: 1;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.5vw;
+            padding: 3vh 2vw;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.2rem;
+            font-size: 3.5vw;
             line-height: 1.4;
             text-align: center;
+            font-weight: 700;
+            color: #1e293b;
             overflow-y: auto;
-            font-weight: bold;
-            color: #2575fc;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
         }
 
         .question-display.highlight {
-            animation: highlightQuestion 1s ease;
+            animation: highlightQuestion 0.6s ease;
         }
 
         @keyframes highlightQuestion {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); background-color: #e6f7ff; }
+            50% { transform: scale(1.02); background-color: #eef2ff; }
             100% { transform: scale(1); }
         }
 
+
+        /* 右侧：学生区 */
+        .student-panel {
+            width: 50vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #1e293b;
+        }
+
+        .student-panel .panel-title {
+            color: #64748b;
+            padding: 3vh 2.5vw 0;
+        }
+
         .student-display {
-            flex-grow: 1;
-            background: white;
-            border: 2px solid #ff6b6b;
-            border-radius: 20px;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            font-size: 8vw;
+            font-weight: 900;
+            color: #f59e0b;
             position: relative;
+            padding: 2vw;
+            letter-spacing: 0.1em;
         }
 
         .control-buttons {
             display: flex;
-            gap: 15px;
+            gap: 2vw;
             justify-content: center;
-            margin-top: 20px;
+            padding: 3vh 2.5vw;
         }
 
         .ctrl-btn {
-            padding: 14px 30px;
-            font-size: 1.2rem;
-            border-radius: 50px;
+            padding: 2vh 4vw;
+            font-size: 2vw;
+            border-radius: 1vw;
             border: none;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            font-weight: 700;
+            transition: all 0.15s ease;
+            min-height: 8vh;
+            flex: 1;
         }
 
         .ctrl-btn.roll {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: #4f46e5;
             color: white;
+        }
+
+        .ctrl-btn.roll:active {
+            background: #3730a3;
         }
 
         .ctrl-btn.stop {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff9e6b 100%);
+            background: #ef4444;
             color: white;
+        }
+
+        .ctrl-btn.stop:active {
+            background: #dc2626;
         }
 
         .ctrl-btn.pass {
-            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            background: #22c55e;
             color: white;
         }
 
+        .ctrl-btn.pass:active {
+            background: #16a34a;
+        }
+
         .ctrl-btn.fail {
-            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+            background: #94a3b8;
             color: white;
+        }
+
+        .ctrl-btn.fail:active {
+            background: #64748b;
         }
 
         .result-buttons {
             display: none;
-            gap: 15px;
+            gap: 2vw;
             justify-content: center;
-            margin-top: 20px;
+            padding: 3vh 2.5vw;
+        }
+
+        .result-buttons .ctrl-btn {
+            flex: 1;
         }
 
         .result-feedback {
@@ -323,20 +424,15 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 5rem;
-            font-weight: bold;
+            font-size: 12vw;
+            font-weight: 900;
             opacity: 0;
             pointer-events: none;
             z-index: 5;
         }
 
         .result-feedback.show-pass {
-            color: #4CAF50;
-            animation: feedbackAnim 1.5s ease forwards;
-        }
-
-        .result-feedback.show-fail {
-            color: #f44336;
+            color: #22c55e;
             animation: feedbackAnim 1.5s ease forwards;
         }
 
@@ -347,11 +443,6 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
         }
 
-        .ctrl-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-
         .rolling {
             animation: pulse 0.8s infinite alternate;
         }
@@ -360,111 +451,15 @@
             from { transform: scale(1); }
             to { transform: scale(1.05); }
         }
-
-        .error-message {
-            color: #ff6b6b;
-            font-weight: bold;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: #6a11cb;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 20;
-        }
-
-        .shuffle-btn {
-            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
-            color: white;
-            padding: 10px 20px;
-            font-size: 1.1rem;
-            border-radius: 30px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-        .shuffle-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                height: auto;
-                min-height: 580px;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            .config-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .config-label {
-                text-align: center;
-            }
-
-            .recitation-layout {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .student-display {
-                font-size: 2.5rem;
-                min-height: 120px;
-            }
-
-            .question-display {
-                font-size: 1.8rem;
-                min-height: 120px;
-                padding: 15px;
-            }
-
-            .q-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
-            }
-
-            .btn-primary, .btn-secondary, .ctrl-btn {
-                padding: 12px 30px;
-                font-size: 1.1rem;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- 页面容器 -->
-    <div class="container">
-        <!-- 第1页：配置页 -->
-        <div class="page active" id="configPage">
-            <div class="header">
-                <h1>超级抽背大师</h1>
-            </div>
+    <!-- 第1页：配置页 -->
+    <div class="page active" id="configPage">
+        <h1>超级抽背大师</h1>
 
-            <div class="config-grid">
+        <div class="config-grid">
+            <div class="config-item">
                 <div class="config-label">班级</div>
                 <select id="classSelect" class="config-select">
                     <option value="">--请选择--</option>
@@ -473,7 +468,9 @@
                     <option value="高一16班">高一16班</option>
                     <option value="高一20班">高一20班</option>
                 </select>
+            </div>
 
+            <div class="config-item">
                 <div class="config-label">课题</div>
                 <select id="topicSelect" class="config-select">
                     <option value="">--请选择--</option>
@@ -486,59 +483,56 @@
                     <option value="实现人生的价值">实现人生的价值</option>
                 </select>
             </div>
-
-            <button class="btn-primary" id="startClassBtn">上课</button>
-            <div class="error-message" id="configError">请先选择班级和课题！</div>
         </div>
 
-        <!-- 第2页：候课页 -->
-        <div class="page" id="waitingPage">
-            <button class="back-btn" id="backToConfigBtn1">←</button>
-            <div class="header">
-                <h1 id="classTopicTitle">高二7班 - 辩证法（上）</h1>
-                <h2>候课</h2>
-            </div>
+        <button class="btn-primary" id="startClassBtn">上课</button>
+        <div class="error-message" id="configError">请先选择班级和课题！</div>
+    </div>
 
-            <div class="question-list" id="questionListContainer">
-            </div>
-
-            <button class="btn-secondary" id="startRecitationBtn">开始抽背</button>
+    <!-- 第2页：候课页 -->
+    <div class="page" id="waitingPage">
+        <button class="back-btn" id="backToConfigBtn1">←</button>
+        <div class="header">
+            <h1 id="classTopicTitle">辩证法（上）</h1>
         </div>
 
-        <!-- 第3页：抽背页 -->
-        <div class="page" id="recitationPage">
-            <button class="back-btn" id="backToQuestionListBtn">←</button>
-            <h1 id="recitationTitle">高二7班 - 辩证法（上）</h1>
+        <div class="question-list" id="questionListContainer">
+        </div>
 
-            <div class="recitation-layout">
-                <!-- 左侧：问题区域 -->
-                <div class="question-panel">
-                    <div class="panel-title">问题抽选</div>
-                    <div class="question-buttons" id="questionButtons">
-                    </div>
-                    <div class="question-display" id="currentQuestionDisplay">
-                        请选择一个问题
-                    </div>
-                    <button class="shuffle-btn" id="shuffleQuestionsBtn">随机排序问题</button>
+        <button class="btn-secondary" id="startRecitationBtn">开始抽背</button>
+    </div>
+
+    <!-- 第3页：抽背页 -->
+    <div class="page" id="recitationPage">
+        <button class="back-btn" id="backToQuestionListBtn">←</button>
+        <h1 id="recitationTitle">高一8班 - 辩证法（上）</h1>
+
+        <div class="recitation-layout">
+            <!-- 左侧：问题区域 -->
+            <div class="question-panel">
+                <div class="panel-title">问题抽选</div>
+                <div class="question-buttons" id="questionButtons">
+                </div>
+                <div class="question-display" id="currentQuestionDisplay">
+                    请选择一个问题
+                </div>
+            </div>
+
+            <!-- 右侧：学生区域 -->
+            <div class="student-panel">
+                <div class="panel-title">学生抽选</div>
+                <div class="student-display" id="studentDisplay">
+                    ?
+                    <span class="result-feedback" id="resultFeedback"></span>
                 </div>
 
-                <!-- 右侧：学生区域 -->
-                <div class="student-panel">
-                    <div class="panel-title">学生抽选</div>
-                    <div class="student-display" id="studentDisplay">
-                        ?
-                        <span class="result-feedback" id="resultFeedback"></span>
-                    </div>
-
-                    <div class="control-buttons" id="controlButtons">
-                        <button class="ctrl-btn roll" id="rollBtn">抽选</button>
-                        <button class="ctrl-btn stop" id="stopBtn">停止</button>
-                    </div>
-                    <div class="result-buttons" id="resultButtons">
-                        <button class="ctrl-btn pass" id="passBtn">通过 ✓</button>
-                        <button class="ctrl-btn fail" id="failBtn">不通过 ✗</button>
-                    </div>
-
+                <div class="control-buttons" id="controlButtons">
+                    <button class="ctrl-btn roll" id="rollBtn">抽选</button>
+                    <button class="ctrl-btn stop" id="stopBtn">停止</button>
+                </div>
+                <div class="result-buttons" id="resultButtons">
+                    <button class="ctrl-btn pass" id="passBtn">通过 ✓</button>
+                    <button class="ctrl-btn fail" id="failBtn">加油</button>
                 </div>
             </div>
         </div>
@@ -724,7 +718,6 @@
         const rollBtn = document.getElementById('rollBtn');
         const stopBtn = document.getElementById('stopBtn');
         const backToQuestionListBtn = document.getElementById('backToQuestionListBtn');
-        const shuffleQuestionsBtn = document.getElementById('shuffleQuestionsBtn');
         const controlButtons = document.getElementById('controlButtons');
         const resultButtons = document.getElementById('resultButtons');
         const passBtn = document.getElementById('passBtn');
@@ -774,7 +767,7 @@
             currentQuestions = [...topicQuestions[currentTopic]];
             usedQuestions = [];
 
-            classTopicTitle.textContent = `${currentClass} - ${currentTopic}`;
+            classTopicTitle.textContent = currentTopic;
             renderQuestionList();
             showPage(waitingPage);
         });
@@ -809,10 +802,7 @@
         // ========== 抽背页逻辑 ==========
         function renderQuestionButtons() {
             questionButtons.innerHTML = '';
-            const shuffledQuestions = [...currentQuestions];
-            shuffleArray(shuffledQuestions);
-
-            shuffledQuestions.forEach((question, index) => {
+            currentQuestions.forEach((question, index) => {
                 const button = document.createElement('button');
                 button.className = 'q-btn available';
                 button.textContent = index + 1;
@@ -838,18 +828,6 @@
 
                 questionButtons.appendChild(button);
             });
-        }
-
-        shuffleQuestionsBtn.addEventListener('click', () => {
-            renderQuestionButtons();
-        });
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
         }
 
         // ========== 智能抽选（关注名单优先） ==========
@@ -931,15 +909,20 @@
                 addRecord(currentClass, currentTopic, lastSelectedStudent, questionToSave, result);
             }
 
-            resultFeedback.textContent = result === 'pass' ? '✓' : '✗';
-            resultFeedback.className = 'result-feedback ' + (result === 'pass' ? 'show-pass' : 'show-fail');
-
-            setTimeout(() => {
-                resultFeedback.className = 'result-feedback';
-                resultFeedback.textContent = '';
+            if (result === 'pass') {
+                resultFeedback.textContent = '✓';
+                resultFeedback.className = 'result-feedback show-pass';
+                setTimeout(() => {
+                    resultFeedback.className = 'result-feedback';
+                    resultFeedback.textContent = '';
+                    controlButtons.style.display = 'flex';
+                    resultButtons.style.display = 'none';
+                }, 1500);
+            } else {
+                // 不通过：不显示符号，静静回到抽选状态
                 controlButtons.style.display = 'flex';
                 resultButtons.style.display = 'none';
-            }, 1500);
+            }
         }
 
         passBtn.addEventListener('click', () => handleResult('pass'));
