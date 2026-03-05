@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.3.2</title>
+    <title>超级抽背大师 v2.3.3</title>
     <style>
         * {
             box-sizing: border-box;
@@ -475,28 +475,15 @@
             justify-content: center;
         }
 
-        .result-feedback {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12vw;
-            font-weight: 900;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 5;
+        /* 反馈文字弹出动画 */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        .result-feedback.show-pass {
-            color: #22c55e;
-            animation: feedbackAnim 1.5s ease forwards;
-        }
-
-        @keyframes feedbackAnim {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-            70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        .student-display.feedback {
+            animation: popIn 0.4s ease forwards;
         }
 
         .rolling {
@@ -567,10 +554,7 @@
 
         <!-- 学生大名字区 -->
         <div class="student-panel">
-            <div class="student-display" id="studentDisplay">
-                ?
-                <span class="result-feedback" id="resultFeedback"></span>
-            </div>
+            <div class="student-display" id="studentDisplay">?</div>
         </div>
 
         <!-- 按钮区 -->
@@ -797,7 +781,7 @@
         const resultButtons = document.getElementById('resultButtons');
         const passBtn = document.getElementById('passBtn');
         const failBtn = document.getElementById('failBtn');
-        const resultFeedback = document.getElementById('resultFeedback');
+        // resultFeedback 已移除，反馈直接显示在 studentDisplay 上
 
         // ========== 初始化下拉框 ==========
         function populateSelects() {
@@ -881,7 +865,7 @@
             usedQuestions = [];
             renderQuestionDots();
             selectQuestion(0);
-            studentDisplay.childNodes[0].textContent = '?';
+            studentDisplay.textContent = '?';
             lastSelectedStudent = '';
             controlButtons.style.display = 'flex';
             resultButtons.style.display = 'none';
@@ -981,7 +965,7 @@
 
             rollInterval = setInterval(() => {
                 const randomIndex = Math.floor(Math.random() * currentStudents.length);
-                studentDisplay.childNodes[0].textContent = currentStudents[randomIndex];
+                studentDisplay.textContent = currentStudents[randomIndex];
             }, 100);
 
             setTimeout(() => {
@@ -989,7 +973,7 @@
                     clearInterval(rollInterval);
                     isRolling = false;
                     studentDisplay.classList.remove('rolling');
-                    studentDisplay.childNodes[0].textContent = target;
+                    studentDisplay.textContent = target;
                     lastSelectedStudent = target;
                     speakText(target, 1.0, 1.2);
 
@@ -1009,7 +993,7 @@
             isRolling = false;
             studentDisplay.classList.remove('rolling');
 
-            const selectedStudent = studentDisplay.childNodes[0].textContent;
+            const selectedStudent = studentDisplay.textContent;
             lastSelectedStudent = selectedStudent;
             speakText(selectedStudent, 1.0, 1.2);
 
@@ -1023,13 +1007,22 @@
         });
 
         // ========== 通过/不通过按钮 ==========
-        // 加油鼓励语，随机选一句
-        const encourageWords = [
-            '，加油，你可以的！',
-            '，别急，再想想！',
-            '，没关系，下次一定行！',
-            '，继续努力，老师相信你！'
+        const praiseWords = [
+            '太强了', '学霸', '完美', '无敌', '满分',
+            '厉害', '全对', '了不起', '秀啊', '绝了',
+            '真棒', '优秀', '漂亮', '太帅了', '大神',
+            '给力', '封神', '牛', '好记性', '稳得很'
         ];
+
+        const encourageWords = [
+            '加油', '快了快了', '有进步', '别灰心', '马上就会',
+            '差一点点', '继续努力', '你能行', '别紧张', '稳住',
+            '回去再看看', '不难的', '再想想', '下次稳了', '慢慢来'
+        ];
+
+        function randomPick(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
 
         function handleResult(result) {
             if (storageAvailable && lastSelectedStudent) {
@@ -1038,25 +1031,29 @@
             }
 
             if (result === 'pass') {
-                // 语音表扬
-                speakText(lastSelectedStudent + '，你真是太棒了！', 0.9, 1.2);
-                resultFeedback.textContent = '✓';
-                resultFeedback.className = 'result-feedback show-pass';
-                setTimeout(() => {
-                    resultFeedback.className = 'result-feedback';
-                    resultFeedback.textContent = '';
-                    studentDisplay.childNodes[0].textContent = '?';
-                    controlButtons.style.display = 'flex';
-                    resultButtons.style.display = 'none';
-                }, 1500);
+                const word = randomPick(praiseWords);
+                speakText(lastSelectedStudent + '，' + word + '！', 0.9, 1.2);
+                studentDisplay.textContent = word + '！';
+                studentDisplay.style.color = '#C94A4A';
+                studentDisplay.style.fontSize = '8vw';
             } else {
-                // 语音鼓励（随机选一句）
-                const msg = encourageWords[Math.floor(Math.random() * encourageWords.length)];
-                speakText(lastSelectedStudent + msg, 0.9, 1.0);
-                studentDisplay.childNodes[0].textContent = '?';
+                const word = randomPick(encourageWords);
+                speakText(lastSelectedStudent + '，' + word + '！', 0.9, 1.0);
+                studentDisplay.textContent = word + '！';
+                studentDisplay.style.color = '#D4A87C';
+                studentDisplay.style.fontSize = '8vw';
+            }
+
+            // 弹出动画
+            studentDisplay.classList.add('feedback');
+            setTimeout(() => {
+                studentDisplay.classList.remove('feedback');
+                studentDisplay.textContent = '?';
+                studentDisplay.style.color = '#3D2C2C';
+                studentDisplay.style.fontSize = '10vw';
                 controlButtons.style.display = 'flex';
                 resultButtons.style.display = 'none';
-            }
+            }, 2000);
         }
 
         passBtn.addEventListener('click', () => handleResult('pass'));
