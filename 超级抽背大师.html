@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.3.8</title>
+    <title>超级抽背大师 v2.4.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -14,7 +14,7 @@
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
             text-align: center;
-            background: #FAF5F3;
+            background: #FFFBF2;
             color: #3D2C2C;
             margin: 0;
             padding: 0;
@@ -56,7 +56,7 @@
 
         #configPage h1 {
             font-size: 3vw;
-            color: #C94A4A;
+            color: #D4952B;
             font-weight: 700;
             letter-spacing: 0.1em;
         }
@@ -77,7 +77,7 @@
         .config-label {
             font-size: 2vw;
             font-weight: 600;
-            color: #C94A4A;
+            color: #D4952B;
             white-space: nowrap;
         }
 
@@ -86,7 +86,7 @@
             padding: 1.5vh 2vw;
             font-size: 1.8vw;
             border-radius: 1vw;
-            border: 2px solid #E8D8D5;
+            border: 2px solid #E8D8C0;
             background: white;
             color: #3D2C2C;
             cursor: pointer;
@@ -100,12 +100,12 @@
 
         .config-select:focus {
             outline: none;
-            border-color: #C94A4A;
-            box-shadow: 0 0 0 3px rgba(201, 74, 74, 0.15);
+            border-color: #D4952B;
+            box-shadow: 0 0 0 3px rgba(212, 149, 43, 0.15);
         }
 
         .btn-primary {
-            background: #D4918F;
+            background: #E8BC6A;
             color: white;
             padding: 2vh 6vw;
             font-size: 2vw;
@@ -118,15 +118,15 @@
         }
 
         .btn-primary:hover {
-            background: #C94A4A;
+            background: #D4952B;
         }
 
         .btn-primary:active {
-            background: #B03E3E;
+            background: #B8821F;
         }
 
         .error-message {
-            color: #C94A4A;
+            color: #D4952B;
             font-size: 1.6vw;
             font-weight: 600;
             display: none;
@@ -147,7 +147,7 @@
 
         #waitingPage h1 {
             font-size: 2.5vw;
-            color: #C94A4A;
+            color: #D4952B;
             font-weight: 700;
         }
 
@@ -172,17 +172,17 @@
 
         .question-item {
             padding: 1.5vh 2vw;
-            border-left: 0.4vw solid #C94A4A;
+            border-left: 0.4vw solid #D4952B;
             margin-bottom: 1.2vh;
             font-size: 2.2vw;
             line-height: 1.5;
             color: #3D2C2C;
-            background: #FFF8F7;
+            background: #FFFCF2;
             border-radius: 0 0.5vw 0.5vw 0;
         }
 
         .btn-secondary {
-            background: #D4918F;
+            background: #E8BC6A;
             color: white;
             padding: 2vh 6vw;
             font-size: 2vw;
@@ -196,18 +196,18 @@
         }
 
         .btn-secondary:hover {
-            background: #C94A4A;
+            background: #D4952B;
         }
 
         .btn-secondary:active {
-            background: #B03E3E;
+            background: #B8821F;
         }
 
         .back-btn {
             position: fixed;
             top: 2vh;
             left: 2vw;
-            background: #C94A4A;
+            background: #D4952B;
             color: white;
             border: none;
             border-radius: 50%;
@@ -223,7 +223,7 @@
         }
 
         .back-btn:active {
-            background: #B03E3E;
+            background: #B8821F;
         }
 
         /* ===== 抽背页：纯白底 ===== */
@@ -243,14 +243,14 @@
             justify-content: space-between;
             padding: 0 3vw;
             background: #FFFFFF;
-            border-bottom: 1px solid #E8D8D5;
+            border-bottom: 1px solid #E8D8C0;
             flex-shrink: 0;
         }
 
         .topbar-back {
             background: transparent;
             color: #9E8888;
-            border: 2px solid #E8D8D5;
+            border: 2px solid #E8D8C0;
             border-radius: 1vh;
             width: 5vh;
             height: 5vh;
@@ -265,8 +265,8 @@
         }
 
         .topbar-back:active {
-            background: #FFF0EE;
-            color: #C94A4A;
+            background: #FFF8E8;
+            color: #D4952B;
         }
 
         .question-nav {
@@ -277,8 +277,8 @@
 
         .nav-arrow {
             background: transparent;
-            border: 2px solid #D4918F;
-            color: #C94A4A;
+            border: 2px solid #E8BC6A;
+            color: #D4952B;
             border-radius: 1vh;
             width: 5vh;
             height: 5vh;
@@ -291,7 +291,7 @@
         }
 
         .nav-arrow:active {
-            background: #C94A4A;
+            background: #D4952B;
             color: white;
         }
 
@@ -312,8 +312,8 @@
             width: 1.4vh;
             height: 1.4vh;
             border-radius: 50%;
-            background: #E8D8D5;
-            border: 2px solid #D4C4C1;
+            background: #E8D8C0;
+            border: 2px solid #D4CCAA;
             transition: all 0.2s ease;
             cursor: pointer;
         }
@@ -324,9 +324,9 @@
         }
 
         .q-dot.current {
-            background: #C94A4A;
-            border-color: #C94A4A;
-            box-shadow: 0 0 0 3px rgba(201, 74, 74, 0.25);
+            background: #D4952B;
+            border-color: #D4952B;
+            box-shadow: 0 0 0 3px rgba(212, 149, 43, 0.25);
             transform: scale(1.3);
         }
 
@@ -349,7 +349,7 @@
             font-size: 5vw;
             line-height: 1.4;
             font-weight: 500;
-            color: #C94A4A;
+            color: #D4952B;
             text-align: center;
             flex-shrink: 0;
         }
@@ -361,7 +361,7 @@
             height: 4.5vw;
             margin-right: 1vw;
             flex-shrink: 0;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23C94A4A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 32v3a5 5 0 0 0 10 0v-3'/%3E%3Cpath d='M19 32a12 12 0 1 1 10 0'/%3E%3Cline x1='21' y1='37' x2='27' y2='37'/%3E%3Cline x1='24' y1='20' x2='24' y2='26'/%3E%3Cline x1='20' y1='23' x2='24' y2='26'/%3E%3Cline x1='28' y1='23' x2='24' y2='26'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23D4952B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 10h28a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H16l-6 6v-6H6a2 2 0 0 1-2-2V12a2 2 0 0 1 2-2z'/%3E%3Cline x1='12' y1='18' x2='28' y2='18'/%3E%3Cline x1='12' y1='24' x2='22' y2='24'/%3E%3C/svg%3E");
             background-size: contain;
             background-repeat: no-repeat;
         }
@@ -429,44 +429,44 @@
         }
 
         .ctrl-btn.roll {
-            background: #C94A4A;
+            background: #D4952B;
             color: white;
-            box-shadow: 0 4px 15px rgba(201, 74, 74, 0.3);
+            box-shadow: 0 4px 15px rgba(212, 149, 43, 0.3);
         }
 
         .ctrl-btn.roll:active {
-            background: #B03E3E;
-            box-shadow: 0 2px 8px rgba(201, 74, 74, 0.3);
+            background: #B8821F;
+            box-shadow: 0 2px 8px rgba(212, 149, 43, 0.3);
         }
 
         .ctrl-btn.stop {
-            background: #D4918F;
+            background: #E8BC6A;
             color: white;
-            box-shadow: 0 4px 15px rgba(212, 145, 143, 0.3);
+            box-shadow: 0 4px 15px rgba(232, 188, 106, 0.3);
         }
 
         .ctrl-btn.stop:active {
-            background: #C07A78;
+            background: #D4A84B;
         }
 
         .ctrl-btn.pass {
-            background: #C94A4A;
+            background: #D4952B;
             color: white;
-            box-shadow: 0 4px 15px rgba(201, 74, 74, 0.3);
+            box-shadow: 0 4px 15px rgba(212, 149, 43, 0.3);
         }
 
         .ctrl-btn.pass:active {
-            background: #B03E3E;
+            background: #B8821F;
         }
 
         .ctrl-btn.fail {
-            background: #D4A87C;
+            background: #E8BC6A;
             color: white;
-            box-shadow: 0 4px 15px rgba(212, 168, 124, 0.3);
+            box-shadow: 0 4px 15px rgba(232, 188, 106, 0.3);
         }
 
         .ctrl-btn.fail:active {
-            background: #C4956A;
+            background: #D4A84B;
         }
 
         .result-buttons {
