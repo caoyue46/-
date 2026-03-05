@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.3.6</title>
+    <title>超级抽背大师 v2.3.7</title>
     <style>
         * {
             box-sizing: border-box;
@@ -357,7 +357,7 @@
         .question-text-area::before {
             content: '💡';
             margin-right: 1vw;
-            font-size: 2.5vw;
+            font-size: 5vw;
             flex-shrink: 0;
         }
 
@@ -1003,16 +1003,18 @@
 
         // ========== 通过/不通过按钮 ==========
         const praiseWords = [
-            '太强了', '学霸', '完美', '无敌', '满分',
-            '厉害', '全对', '了不起', '秀啊', '绝了',
-            '真棒', '优秀', '漂亮', '太帅了', '大神',
-            '给力', '封神', '牛', '好记性', '稳得很'
+            '背得真好', '记得很牢', '非常棒', '回答得很好', '真不错',
+            '掌握得很好', '很流利', '说得对', '真用心', '进步很大',
+            '越来越好了', '背得很熟', '很扎实', '不错不错', '很棒',
+            '答得漂亮', '记得真清楚', '表现很好', '功夫下到了', '好样的'
         ];
 
         const encourageWords = [
-            '加油', '快了快了', '有进步', '别灰心', '马上就会',
-            '差一点点', '继续努力', '你能行', '别紧张', '稳住',
-            '回去再看看', '不难的', '再想想', '下次稳了', '慢慢来'
+            '再看看书，下次一定行', '差一点点，加把劲', '没关系，回去再熟悉一下',
+            '慢慢来，不着急', '有印象了，再巩固一下', '方向是对的，再记一记',
+            '别紧张，下次会更好', '快了快了，再练一练', '不难的，多看两遍就熟了',
+            '有进步，继续加油', '能记住一部分，很好了', '回去看一看，下次肯定过',
+            '别灰心，大家都在进步', '基础有了，再熟悉一下', '加油，老师相信你'
         ];
 
         function randomPick(arr) {
@@ -1026,9 +1028,9 @@
             }
 
             if (result === 'pass') {
-                speakText(lastSelectedStudent + '，' + randomPick(praiseWords) + '！', 0.9, 1.2);
+                speakText(lastSelectedStudent + '，' + randomPick(praiseWords) + '。', 0.9, 1.1);
             } else {
-                speakText(lastSelectedStudent + '，' + randomPick(encourageWords) + '！', 0.9, 1.0);
+                speakText(lastSelectedStudent + '，' + randomPick(encourageWords) + '。', 0.9, 1.0);
             }
 
             // 名字保留显示，切回抽选按钮，点抽选时才变问号
