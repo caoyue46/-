@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.3.0</title>
+    <title>超级抽背大师 v2.3.1</title>
     <style>
         * {
             box-sizing: border-box;
@@ -337,22 +337,27 @@
             transform: scale(1.3);
         }
 
-        /* 问题文字区 */
+        /* 问题文字区：灯泡图标 + 暖灰色 */
         .question-text-area {
             width: 100vw;
-            min-height: 20vh;
+            min-height: 12vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 3vh 6vw;
-            background: #FFFFFF;
-            font-size: 3vw;
+            padding: 2vh 6vw;
+            background: transparent;
+            font-size: 2.5vw;
             line-height: 1.5;
-            font-weight: 700;
-            color: #3D2C2C;
+            font-weight: 600;
+            color: #6B5050;
             text-align: center;
             flex-shrink: 0;
-            border-bottom: 1px solid #E8D8D5;
+        }
+
+        .question-text-area::before {
+            content: '💡';
+            margin-right: 1vw;
+            font-size: 2.5vw;
         }
 
         .question-text-area.switching {
@@ -366,13 +371,13 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* 学生区 */
+        /* 学生区：透明背景，靠字号超大突出 */
         .student-panel {
             width: 100vw;
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #FFF0EE;
+            background: transparent;
         }
 
         .student-display {
@@ -380,19 +385,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8vw;
+            font-size: 10vw;
             font-weight: 900;
             color: #3D2C2C;
             position: relative;
             padding: 2vw;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
         }
 
         /* 按钮区 */
         .button-area {
             width: 100vw;
             padding: 2vh 4vw 3vh;
-            background: #FAF5F3;
+            background: transparent;
             flex-shrink: 0;
         }
 
@@ -961,6 +966,7 @@
 
         // 学生抽选逻辑
         rollBtn.addEventListener('click', () => {
+            if (isRolling) return; // 防止重复点击
             if (currentStudents.length === 0) {
                 alert('所有学生都已抽选完毕！');
                 return;
@@ -1016,6 +1022,14 @@
         });
 
         // ========== 通过/不通过按钮 ==========
+        // 加油鼓励语，随机选一句
+        const encourageWords = [
+            '，加油，你可以的！',
+            '，别急，再想想！',
+            '，没关系，下次一定行！',
+            '，继续努力，老师相信你！'
+        ];
+
         function handleResult(result) {
             if (storageAvailable && lastSelectedStudent) {
                 const questionToSave = lastSelectedQuestion || '未选择问题';
@@ -1023,6 +1037,8 @@
             }
 
             if (result === 'pass') {
+                // 语音表扬
+                speakText(lastSelectedStudent + '，你真是太棒了！', 0.9, 1.2);
                 resultFeedback.textContent = '✓';
                 resultFeedback.className = 'result-feedback show-pass';
                 setTimeout(() => {
@@ -1033,7 +1049,9 @@
                     resultButtons.style.display = 'none';
                 }, 1500);
             } else {
-                // 不通过：不显示符号，静静回到抽选状态
+                // 语音鼓励（随机选一句）
+                const msg = encourageWords[Math.floor(Math.random() * encourageWords.length)];
+                speakText(lastSelectedStudent + msg, 0.9, 1.0);
                 studentDisplay.childNodes[0].textContent = '?';
                 controlButtons.style.display = 'flex';
                 resultButtons.style.display = 'none';
