@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.3.4</title>
+    <title>超级抽背大师 v2.3.5</title>
     <style>
         * {
             box-sizing: border-box;
@@ -564,7 +564,7 @@
                 <button class="ctrl-btn stop" id="stopBtn">停止</button>
             </div>
             <div class="result-buttons" id="resultButtons">
-                <button class="ctrl-btn pass" id="passBtn">通过 ✓</button>
+                <button class="ctrl-btn pass" id="passBtn">通过</button>
                 <button class="ctrl-btn fail" id="failBtn">加油</button>
             </div>
         </div>
@@ -1036,7 +1036,7 @@
                 speakText(lastSelectedStudent + '，' + randomPick(encourageWords) + '！', 0.9, 1.0);
             }
 
-            studentDisplay.textContent = '?';
+            // 名字保留显示，切回抽选按钮，点抽选时才变问号
             controlButtons.style.display = 'flex';
             resultButtons.style.display = 'none';
         }
