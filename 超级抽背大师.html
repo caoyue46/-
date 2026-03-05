@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.3.3</title>
+    <title>超级抽背大师 v2.3.4</title>
     <style>
         * {
             box-sizing: border-box;
@@ -1031,29 +1031,14 @@
             }
 
             if (result === 'pass') {
-                const word = randomPick(praiseWords);
-                speakText(lastSelectedStudent + '，' + word + '！', 0.9, 1.2);
-                studentDisplay.textContent = word + '！';
-                studentDisplay.style.color = '#C94A4A';
-                studentDisplay.style.fontSize = '8vw';
+                speakText(lastSelectedStudent + '，' + randomPick(praiseWords) + '！', 0.9, 1.2);
             } else {
-                const word = randomPick(encourageWords);
-                speakText(lastSelectedStudent + '，' + word + '！', 0.9, 1.0);
-                studentDisplay.textContent = word + '！';
-                studentDisplay.style.color = '#D4A87C';
-                studentDisplay.style.fontSize = '8vw';
+                speakText(lastSelectedStudent + '，' + randomPick(encourageWords) + '！', 0.9, 1.0);
             }
 
-            // 弹出动画
-            studentDisplay.classList.add('feedback');
-            setTimeout(() => {
-                studentDisplay.classList.remove('feedback');
-                studentDisplay.textContent = '?';
-                studentDisplay.style.color = '#3D2C2C';
-                studentDisplay.style.fontSize = '10vw';
-                controlButtons.style.display = 'flex';
-                resultButtons.style.display = 'none';
-            }, 2000);
+            studentDisplay.textContent = '?';
+            controlButtons.style.display = 'flex';
+            resultButtons.style.display = 'none';
         }
 
         passBtn.addEventListener('click', () => handleResult('pass'));
