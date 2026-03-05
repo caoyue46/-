@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.3.1</title>
+    <title>超级抽背大师 v2.3.2</title>
     <style>
         * {
             box-sizing: border-box;
@@ -337,15 +337,18 @@
             transform: scale(1.3);
         }
 
-        /* 问题文字区：灯泡图标 + 暖灰色 */
+        /* 问题文字区：白色卡片浮层，与上下明确分隔 */
         .question-text-area {
-            width: 100vw;
-            min-height: 12vh;
+            width: 92vw;
+            margin: 2vh auto;
+            min-height: 10vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2vh 6vw;
-            background: transparent;
+            padding: 2.5vh 4vw;
+            background: #FFFFFF;
+            border-radius: 2vw;
+            box-shadow: 0 2px 12px rgba(61, 44, 44, 0.06);
             font-size: 2.5vw;
             line-height: 1.5;
             font-weight: 600;
@@ -358,6 +361,7 @@
             content: '💡';
             margin-right: 1vw;
             font-size: 2.5vw;
+            flex-shrink: 0;
         }
 
         .question-text-area.switching {
@@ -371,13 +375,17 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* 学生区：透明背景，靠字号超大突出 */
+        /* 学生区：暖色底衬，与问题区明确区分 */
         .student-panel {
-            width: 100vw;
+            width: 92vw;
+            margin: 0 auto;
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: transparent;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #FFF5F3 0%, #FAF0ED 100%);
+            border-radius: 2vw;
         }
 
         .student-display {
@@ -391,87 +399,80 @@
             position: relative;
             padding: 2vw;
             letter-spacing: 0.15em;
+            width: 100%;
         }
 
-        /* 按钮区 */
+        /* 按钮区：嵌在学生区底部 */
         .button-area {
-            width: 100vw;
-            padding: 2vh 4vw 3vh;
-            background: transparent;
+            width: 100%;
+            padding: 1.5vh 4vw 3vh;
             flex-shrink: 0;
         }
 
         .control-buttons {
             display: flex;
-            gap: 2vw;
+            gap: 3vw;
             justify-content: center;
         }
 
         .ctrl-btn {
-            padding: 2.5vh 4vw;
-            font-size: 2vw;
-            border-radius: 1.5vw;
+            padding: 2vh 5vw;
+            font-size: 1.8vw;
+            border-radius: 5vh;
             border: none;
             cursor: pointer;
             font-weight: 700;
             transition: all 0.15s ease;
-            min-height: 8vh;
-            flex: 1;
-            letter-spacing: 0.05em;
+            min-height: 7vh;
+            min-width: 18vw;
+            letter-spacing: 0.08em;
         }
 
         .ctrl-btn.roll {
-            background: linear-gradient(135deg, #D4918F, #C94A4A);
+            background: #C94A4A;
             color: white;
-            box-shadow: 0 4px 15px rgba(201, 74, 74, 0.25);
+            box-shadow: 0 4px 15px rgba(201, 74, 74, 0.3);
         }
 
         .ctrl-btn.roll:active {
-            background: linear-gradient(135deg, #C94A4A, #B03E3E);
+            background: #B03E3E;
             box-shadow: 0 2px 8px rgba(201, 74, 74, 0.3);
         }
 
         .ctrl-btn.stop {
-            background: transparent;
-            color: #C94A4A;
-            border: 2px solid #D4918F;
+            background: #D4918F;
+            color: white;
+            box-shadow: 0 4px 15px rgba(212, 145, 143, 0.3);
         }
 
         .ctrl-btn.stop:active {
-            background: #FFF0EE;
-            color: #B03E3E;
+            background: #C07A78;
         }
 
         .ctrl-btn.pass {
-            background: linear-gradient(135deg, #D4A87C, #C4956A);
+            background: #C94A4A;
             color: white;
-            box-shadow: 0 4px 15px rgba(196, 149, 106, 0.3);
+            box-shadow: 0 4px 15px rgba(201, 74, 74, 0.3);
         }
 
         .ctrl-btn.pass:active {
-            background: linear-gradient(135deg, #C4956A, #B0835A);
-            box-shadow: 0 2px 8px rgba(196, 149, 106, 0.3);
+            background: #B03E3E;
         }
 
         .ctrl-btn.fail {
-            background: transparent;
-            color: #9E8888;
-            border: 2px solid #E8D8D5;
+            background: #D4A87C;
+            color: white;
+            box-shadow: 0 4px 15px rgba(212, 168, 124, 0.3);
         }
 
         .ctrl-btn.fail:active {
-            background: #FAF5F3;
-            color: #3D2C2C;
+            background: #C4956A;
         }
 
         .result-buttons {
             display: none;
-            gap: 2vw;
+            gap: 3vw;
             justify-content: center;
-        }
-
-        .result-buttons .ctrl-btn {
-            flex: 1;
         }
 
         .result-feedback {
