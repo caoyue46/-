@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 · 管理后台 v2.2.0</title>
+    <title>超级抽背大师 · 管理后台 v2.3.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -650,6 +650,38 @@
             transform: translateY(0);
         }
 
+        /* ========== 数据备份样式 ========== */
+        .backup-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .btn-backup {
+            padding: 8px 24px;
+            font-size: 0.95rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .btn-backup:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-backup.export {
+            background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+        }
+
+        .btn-backup.import {
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+        }
+
         @media (max-width: 768px) {
             .container {
                 min-height: auto;
@@ -746,6 +778,12 @@
             <button class="back-btn" id="backFromDataManage">←</button>
             <h2>数据管理</h2>
             <p style="color: #999; margin-bottom: 1rem;">编辑班级名单和课题问题，保存后教室版自动生效</p>
+
+            <div class="backup-section">
+                <button class="btn-backup export" id="exportAllBtn">导出备份</button>
+                <button class="btn-backup import" id="importAllBtn">导入备份</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none">
+            </div>
 
             <div class="data-tabs">
                 <button class="data-tab-btn active" data-dtab="studentsTab">班级名单</button>
@@ -1501,6 +1539,75 @@
             renderTopicList();
             document.getElementById('topicsTextarea').value = '';
             showToast('课题已删除');
+        });
+
+        // ========== 数据备份：导出/导入 ==========
+        // 导出所有数据为JSON文件
+        document.getElementById('exportAllBtn').addEventListener('click', () => {
+            const data = {
+                version: 'v2.3.0',
+                exportDate: new Date().toISOString(),
+                records: loadRecords(),
+                focus: JSON.parse(localStorage.getItem(FOCUS_KEY) || '{}'),
+                students: getStudents(),
+                topics: getTopics()
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const dateStr = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
+            link.download = `抽背大师_备份_${dateStr}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('备份已导出');
+        });
+
+        // 导入数据
+        document.getElementById('importAllBtn').addEventListener('click', () => {
+            document.getElementById('importFileInput').click();
+        });
+
+        document.getElementById('importFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+
+                    // 验证数据格式
+                    if (!data.records && !data.students && !data.topics) {
+                        alert('文件格式不正确，请选择正确的备份文件');
+                        return;
+                    }
+
+                    if (!confirm('导入将覆盖当前所有数据，确定继续？')) return;
+
+                    // 恢复数据
+                    if (data.records) saveRecords(data.records);
+                    if (data.focus) localStorage.setItem(FOCUS_KEY, JSON.stringify(data.focus));
+                    if (data.students) saveStudents(data.students);
+                    if (data.topics) saveTopicsData(data.topics);
+
+                    // 刷新页面数据
+                    allClassStudents = getStudents();
+                    allTopicQuestions = getTopics();
+                    populateAllSelects();
+                    initDataManage();
+
+                    showToast('数据已恢复');
+                } catch (err) {
+                    alert('文件读取失败，请确认是正确的备份文件');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = ''; // 清空，允许重复选择同一文件
         });
     </script>
 </body>

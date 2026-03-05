@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.2.1</title>
+    <title>超级抽背大师 v2.3.0</title>
     <style>
         * {
             box-sizing: border-box;
@@ -158,27 +158,86 @@
             margin-top: 0.5vh;
         }
 
-        .question-list {
+        /* 候课页：一题一屏卡片 */
+        .waiting-card-area {
+            display: flex;
+            align-items: center;
+            gap: 2vw;
             width: 90vw;
             flex: 1;
-            overflow-y: auto;
-            text-align: left;
-            padding: 2vh 3vw;
-            background: white;
-            border-radius: 1.5vw;
-            margin-bottom: 2vh;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
-        .question-item {
-            padding: 1.5vh 2vw;
-            border-left: 0.4vw solid #4f46e5;
-            margin-bottom: 1.2vh;
-            font-size: 2.2vw;
-            line-height: 1.5;
+        .waiting-nav {
+            background: transparent;
+            color: #4f46e5;
+            border: 2px solid #c7d2fe;
+            border-radius: 50%;
+            width: 6vh;
+            height: 6vh;
+            font-size: 2.5vh;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .waiting-nav:active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+
+        .waiting-card {
+            flex: 1;
+            background: white;
+            border-radius: 2vw;
+            padding: 5vh 4vw;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 55vh;
+            border: 2px solid #e2e8f0;
+            transition: opacity 0.3s ease;
+        }
+
+        .waiting-card-num {
+            font-size: 6vw;
+            font-weight: 900;
+            color: #e0e7ff;
+            line-height: 1;
+            margin-bottom: 3vh;
+        }
+
+        .waiting-card-text {
+            font-size: 2.8vw;
+            font-weight: 700;
             color: #1e293b;
-            background: #f8fafc;
-            border-radius: 0 0.5vw 0.5vw 0;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .waiting-progress {
+            display: flex;
+            gap: 0.8vw;
+            justify-content: center;
+            margin: 2vh 0;
+        }
+
+        .waiting-dot {
+            width: 1.2vh;
+            height: 1.2vh;
+            border-radius: 50%;
+            background: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .waiting-dot.current {
+            background: #4f46e5;
+            transform: scale(1.4);
         }
 
         .btn-secondary {
@@ -528,15 +587,23 @@
         <div class="error-message" id="configError">请先选择班级和课题！</div>
     </div>
 
-    <!-- 第2页：候课页 -->
+    <!-- 第2页：候课页（一题一屏卡片） -->
     <div class="page" id="waitingPage">
         <button class="back-btn" id="backToConfigBtn1">←</button>
         <div class="header">
             <h1 id="classTopicTitle">辩证法（上）</h1>
         </div>
 
-        <div class="question-list" id="questionListContainer">
+        <div class="waiting-card-area">
+            <button class="waiting-nav" id="waitingPrevBtn">◀</button>
+            <div class="waiting-card">
+                <div class="waiting-card-num" id="waitingCardNum">1</div>
+                <div class="waiting-card-text" id="waitingCardText">问题内容</div>
+            </div>
+            <button class="waiting-nav" id="waitingNextBtn">▶</button>
         </div>
+
+        <div class="waiting-progress" id="waitingProgress"></div>
 
         <button class="btn-secondary" id="startRecitationBtn">开始抽背</button>
     </div>
@@ -762,6 +829,7 @@
         let lastSelectedStudent = '';
         let storageAvailable = false;
         let currentQuestionIndex = 0; // 当前题号索引
+        let waitingIndex = 0; // 候课页当前预览题号
 
         // ========== DOM元素 ==========
         const configPage = document.getElementById('configPage');
@@ -774,7 +842,6 @@
         const configError = document.getElementById('configError');
 
         const classTopicTitle = document.getElementById('classTopicTitle');
-        const questionListContainer = document.getElementById('questionListContainer');
         const startRecitationBtn = document.getElementById('startRecitationBtn');
         const backToConfigBtn1 = document.getElementById('backToConfigBtn1');
 
@@ -855,19 +922,40 @@
             usedQuestions = [];
 
             classTopicTitle.textContent = currentTopic;
-            renderQuestionList();
+            waitingIndex = 0;
+            renderWaitingCard();
             showPage(waitingPage);
         });
 
-        function renderQuestionList() {
-            questionListContainer.innerHTML = '';
-            currentQuestions.forEach((question) => {
-                const questionItem = document.createElement('div');
-                questionItem.className = 'question-item';
-                questionItem.textContent = question;
-                questionListContainer.appendChild(questionItem);
+        // 候课页：一题一屏卡片渲染
+        function renderWaitingCard() {
+            if (currentQuestions.length === 0) return;
+            document.getElementById('waitingCardNum').textContent = waitingIndex + 1;
+            document.getElementById('waitingCardText').textContent = currentQuestions[waitingIndex];
+
+            // 渲染进度小圆点
+            const container = document.getElementById('waitingProgress');
+            container.innerHTML = '';
+            currentQuestions.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.className = 'waiting-dot' + (i === waitingIndex ? ' current' : '');
+                container.appendChild(dot);
             });
         }
+
+        document.getElementById('waitingPrevBtn').addEventListener('click', () => {
+            if (waitingIndex > 0) {
+                waitingIndex--;
+                renderWaitingCard();
+            }
+        });
+
+        document.getElementById('waitingNextBtn').addEventListener('click', () => {
+            if (waitingIndex < currentQuestions.length - 1) {
+                waitingIndex++;
+                renderWaitingCard();
+            }
+        });
 
         // ========== 候课页逻辑 ==========
         startRecitationBtn.addEventListener('click', () => {
@@ -1062,7 +1150,6 @@
 
             currentStudents = [...allClassStudents[currentClass]];
             currentQuestions = [...topicQuestions[currentTopic]];
-            renderQuestionList();
         }
 
         initApp();
