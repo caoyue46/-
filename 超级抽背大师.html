@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>超级抽背大师 v2.4.0</title>
+    <title>超级抽背大师 v2.4.1</title>
     <style>
         * {
             box-sizing: border-box;
@@ -910,9 +910,10 @@
                 usedQuestions.push(question);
             }
 
-            // 切题动画
+            // 切题动画 + 语音朗读题目
             questionTextArea.classList.add('switching');
             setTimeout(() => questionTextArea.classList.remove('switching'), 400);
+            speakText(questionText, 0.9, 1.0);
 
             renderQuestionDots();
         }
@@ -1033,9 +1034,9 @@
             }
 
             if (result === 'pass') {
-                speakText(lastSelectedStudent + '，' + randomPick(praiseWords) + '。', 0.9, 1.1);
+                speakText(randomPick(praiseWords) + '。', 0.9, 1.1);
             } else {
-                speakText(lastSelectedStudent + '，' + randomPick(encourageWords) + '。', 0.9, 1.0);
+                speakText(randomPick(encourageWords) + '。', 0.9, 1.0);
             }
 
             // 名字保留显示，切回抽选按钮，点抽选时才变问号
