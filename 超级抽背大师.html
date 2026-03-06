@@ -886,7 +886,8 @@
                 opt.textContent = cls;
                 classSelect.appendChild(opt);
             });
-            // 填充课题下拉框（用 <optgroup> 两级分组）
+            // 填充课题下拉框（优先用 <optgroup> 分组，如果匹配不上则平铺）
+            let groupMatched = 0;
             topicGroups.forEach(group => {
                 const optgroup = document.createElement('optgroup');
                 optgroup.label = group.label;
@@ -896,10 +897,22 @@
                         opt.value = item;
                         opt.textContent = item;
                         optgroup.appendChild(opt);
+                        groupMatched++;
                     }
                 });
-                topicSelect.appendChild(optgroup);
+                if (optgroup.children.length > 0) {
+                    topicSelect.appendChild(optgroup);
+                }
             });
+            // 如果分组没匹配上（localStorage 里是旧数据），就平铺显示所有课题
+            if (groupMatched === 0) {
+                Object.keys(topicQuestions).forEach(topic => {
+                    const opt = document.createElement('option');
+                    opt.value = topic;
+                    opt.textContent = topic;
+                    topicSelect.appendChild(opt);
+                });
+            }
             // 设置默认选中
             if (allClassStudents[currentClass]) classSelect.value = currentClass;
             if (topicQuestions[currentTopic]) topicSelect.value = currentTopic;

@@ -1106,7 +1106,8 @@
                 opt.textContent = cls;
                 fClassSel.appendChild(opt);
             });
-            // 课题用 <optgroup> 分组
+            // 课题用 <optgroup> 分组（如果匹配不上则平铺）
+            let fGroupMatched = 0;
             topicGroups.forEach(group => {
                 const optgroup = document.createElement('optgroup');
                 optgroup.label = group.label;
@@ -1116,10 +1117,21 @@
                         opt.value = item;
                         opt.textContent = item;
                         optgroup.appendChild(opt);
+                        fGroupMatched++;
                     }
                 });
-                fTopicSel.appendChild(optgroup);
+                if (optgroup.children.length > 0) {
+                    fTopicSel.appendChild(optgroup);
+                }
             });
+            if (fGroupMatched === 0) {
+                Object.keys(topics).forEach(topic => {
+                    const opt = document.createElement('option');
+                    opt.value = topic;
+                    opt.textContent = topic;
+                    fTopicSel.appendChild(opt);
+                });
+            }
         }
         populateAllSelects();
 
