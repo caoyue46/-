@@ -1,11 +1,12 @@
 # Spec — 规约文档
 
-## 文件架构（双文件）
+## 文件架构（数据代码分离）
 
 ```
 项目目录/
 ├── 超级抽背大师.html      ← 教室用，只有抽背功能，干净简洁
 ├── 管理后台.html          ← 老师用，学情看板 + 关注名单 + 数据管理
+├── data.js                ← 共享数据（学生名单 + 课题问题 + 分组），改题库只改这个文件
 └── questions/             ← MD格式题库（数据源，便于编辑复用）
     ├── 第一课-复习.md
     ├── 1.1-追求智慧的学问.md
@@ -14,10 +15,11 @@
 
 U盘/
 ├── 超级抽背大师.html
-└── 管理后台.html
+├── 管理后台.html
+└── data.js
 ```
 
-两个文件共享同一 localStorage，数据互通。
+两个 HTML 通过 `<script src="data.js">` 引入共享数据，共享同一 localStorage，数据互通。
 
 ## 页面流程
 
@@ -141,6 +143,7 @@ U盘/
 | v2.3.3 | 2026-03-04 | 去掉✓打勾，通过/加油改为随机文字反馈(20句表扬+15句鼓励)+弹出动画+语音 |
 | v3.0.0 | 2026-03-06 | 数据架构重构：MD数据源 + 课/框两级结构(optgroup) + 答案系统(||分隔符) + questions/目录 |
 | v3.0.1 | 2026-03-06 | 教室版一键"导出抽背记录"按钮 + 管理后台合并导入（教室记录自动去重合并） |
+| v3.1.0 | 2026-03-06 | 数据代码分离：抽出 data.js（defaultStudents + defaultTopics + topicGroups），两个 HTML 用 script 引入，改题库只改 data.js |
 
 ## 使用工作流（老师日常）
 
@@ -166,8 +169,8 @@ U盘/
 1. 在 `questions/` 目录下编辑 MD 文件
 2. 复习课格式：`1. 问题内容`（每行一题，无答案）
 3. 新课格式：`Q：问题？` + `A：答案。`（Q/A 成对）
-4. 让 Claude 执行编译：读取 MD → 更新 HTML 中的 defaultTopics
-5. 复制 HTML 到 U 盘
+4. 让 Claude 执行编译：读取 MD → 生成新的 `data.js`
+5. 复制 `data.js` + 两个 HTML 到 U 盘
 
 ## 开发工作流（Claude 改代码时）
 
@@ -175,7 +178,7 @@ U盘/
 2. 更新 HTML title 中的版本号
 3. 更新本文件的版本历史
 4. git add → git commit（message以版本号开头）→ git push
-5. 复制两个 HTML 到 U 盘 `/Volumes/U PAN/教学工具/`
+5. 复制三个文件到 U 盘 `/Volumes/U PAN/教学工具/`（超级抽背大师.html + 管理后台.html + data.js）
 
 ## 怎么继续干活（防失忆指南）
 
@@ -205,9 +208,10 @@ Claude 会自动读取所有文件，接上之前的进度。
 | CLAUDE.md | Claude | 快速入口，指向其他文件 |
 | 超级抽背大师.html | 学生 | 教室版，只有抽背功能 |
 | 管理后台.html | 老师 | 学情看板 + 关注名单管理 |
+| data.js | 两者共用 | 学生名单 + 课题问题 + 分组数据 |
 
 ## 项目地址
 
 - 本地：`~/Projects/超级抽背大师/`
 - GitHub：`https://github.com/caoyue46/recite-master`
-- U盘部署：`/Volumes/U PAN/教学工具/超级抽背大师.html` + `/Volumes/U PAN/教学工具/管理后台.html`
+- U盘部署：`/Volumes/U PAN/教学工具/`（超级抽背大师.html + 管理后台.html + data.js）
