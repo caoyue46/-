@@ -15,11 +15,10 @@
 
 U盘/
 ├── 超级抽背大师.html
-├── 管理后台.html
-└── data.js
+└── 管理后台.html
 ```
 
-两个 HTML 通过 `<script src="data.js">` 引入共享数据，共享同一 localStorage，数据互通。
+`data.js` 是数据源文件，更新题库时 Claude 读取 `data.js` 并将数据同步写入两个 HTML（内联 `<script>` 中）。两个 HTML 是自包含的，用 `file://` 协议直接打开即可工作。两个文件共享同一 localStorage，数据互通。
 
 ## 页面流程
 
@@ -143,7 +142,7 @@ U盘/
 | v2.3.3 | 2026-03-04 | 去掉✓打勾，通过/加油改为随机文字反馈(20句表扬+15句鼓励)+弹出动画+语音 |
 | v3.0.0 | 2026-03-06 | 数据架构重构：MD数据源 + 课/框两级结构(optgroup) + 答案系统(||分隔符) + questions/目录 |
 | v3.0.1 | 2026-03-06 | 教室版一键"导出抽背记录"按钮 + 管理后台合并导入（教室记录自动去重合并） |
-| v3.1.0 | 2026-03-06 | 数据代码分离：抽出 data.js（defaultStudents + defaultTopics + topicGroups），两个 HTML 用 script 引入，改题库只改 data.js |
+| v3.1.0 | 2026-03-06 | 数据代码分离：data.js 作为数据源，更新题库时 Claude 自动同步到两个 HTML |
 
 ## 使用工作流（老师日常）
 
@@ -170,7 +169,7 @@ U盘/
 2. 复习课格式：`1. 问题内容`（每行一题，无答案）
 3. 新课格式：`Q：问题？` + `A：答案。`（Q/A 成对）
 4. 让 Claude 执行编译：读取 MD → 生成新的 `data.js`
-5. 复制 `data.js` + 两个 HTML 到 U 盘
+5. 复制两个 HTML 到 U 盘
 
 ## 开发工作流（Claude 改代码时）
 
@@ -178,7 +177,7 @@ U盘/
 2. 更新 HTML title 中的版本号
 3. 更新本文件的版本历史
 4. git add → git commit（message以版本号开头）→ git push
-5. 复制三个文件到 U 盘 `/Volumes/U PAN/教学工具/`（超级抽背大师.html + 管理后台.html + data.js）
+5. 复制两个 HTML 到 U 盘 `/Volumes/U PAN/教学工具/`
 
 ## 怎么继续干活（防失忆指南）
 
@@ -214,4 +213,4 @@ Claude 会自动读取所有文件，接上之前的进度。
 
 - 本地：`~/Projects/超级抽背大师/`
 - GitHub：`https://github.com/caoyue46/recite-master`
-- U盘部署：`/Volumes/U PAN/教学工具/`（超级抽背大师.html + 管理后台.html + data.js）
+- U盘部署：`/Volumes/U PAN/教学工具/`（超级抽背大师.html + 管理后台.html）
