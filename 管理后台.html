@@ -1673,6 +1673,17 @@
             document.getElementById('importFileInput').click();
         });
 
+        // 记录去重合并：用 date+time+className+student+question 作为唯一标识
+        function mergeRecords(existing, incoming) {
+            const existingKeys = new Set(existing.map(r =>
+                r.date + '|' + r.time + '|' + r.className + '|' + r.student + '|' + r.question
+            ));
+            const newRecords = incoming.filter(r =>
+                !existingKeys.has(r.date + '|' + r.time + '|' + r.className + '|' + r.student + '|' + r.question)
+            );
+            return [...existing, ...newRecords];
+        }
+
         document.getElementById('importFileInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1682,21 +1693,33 @@
                 try {
                     const data = JSON.parse(event.target.result);
 
-                    // 验证数据格式
+                    // 教室记录文件（只含 records，合并模式）
+                    if (data.type === 'classroom_records' && data.records) {
+                        const existing = loadRecords();
+                        const merged = mergeRecords(existing, data.records);
+                        const newCount = merged.length - existing.length;
+                        if (newCount === 0) {
+                            showToast('没有新记录需要导入');
+                            return;
+                        }
+                        saveRecords(merged);
+                        showToast('已合并 ' + newCount + ' 条新记录');
+                        return;
+                    }
+
+                    // 完整备份文件（覆盖模式）
                     if (!data.records && !data.students && !data.topics) {
                         alert('文件格式不正确，请选择正确的备份文件');
                         return;
                     }
 
-                    if (!confirm('导入将覆盖当前所有数据，确定继续？')) return;
+                    if (!confirm('这是完整备份文件，导入将覆盖当前所有数据，确定继续？')) return;
 
-                    // 恢复数据
                     if (data.records) saveRecords(data.records);
                     if (data.focus) localStorage.setItem(FOCUS_KEY, JSON.stringify(data.focus));
                     if (data.students) saveStudents(data.students);
                     if (data.topics) saveTopicsData(data.topics);
 
-                    // 刷新页面数据
                     allClassStudents = getStudents();
                     allTopicQuestions = getTopics();
                     populateAllSelects();
@@ -1708,7 +1731,7 @@
                 }
             };
             reader.readAsText(file);
-            e.target.value = ''; // 清空，允许重复选择同一文件
+            e.target.value = '';
         });
     </script>
 </body>

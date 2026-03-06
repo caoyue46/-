@@ -507,6 +507,41 @@
             from { transform: scale(1); }
             to { transform: scale(1.05); }
         }
+
+        .export-link {
+            background: none;
+            border: none;
+            color: #C4B0A0;
+            font-size: 1.2vw;
+            cursor: pointer;
+            margin-top: 1vh;
+        }
+
+        .export-link:active {
+            color: #D4952B;
+        }
+
+        .export-toast {
+            position: fixed;
+            top: 3vh;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #D4952B;
+            color: white;
+            padding: 1.5vh 3vw;
+            border-radius: 1vw;
+            font-size: 1.5vw;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .export-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -532,7 +567,11 @@
 
         <button class="btn-primary" id="startClassBtn">上课</button>
         <div class="error-message" id="configError">请先选择班级和课题！</div>
+        <button class="export-link" id="exportRecordsBtn">导出抽背记录</button>
     </div>
+
+    <!-- 导出提示 -->
+    <div class="export-toast" id="exportToast">已导出</div>
 
     <!-- 第2页：候课页（全部问题列表，学生看屏幕背诵） -->
     <div class="page" id="waitingPage">
@@ -1177,6 +1216,36 @@
                 studentDisplay.classList.remove('rolling');
             }
             showPage(waitingPage);
+        });
+
+        // ========== 导出记录（教室版一键导出） ==========
+        document.getElementById('exportRecordsBtn').addEventListener('click', () => {
+            const records = loadRecords();
+            if (records.length === 0) {
+                alert('暂无抽背记录可导出');
+                return;
+            }
+            const data = {
+                type: 'classroom_records',
+                exportDate: new Date().toISOString(),
+                records: records
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const dateStr = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
+            link.download = '抽背记录_' + dateStr + '.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            // 显示提示
+            const toast = document.getElementById('exportToast');
+            toast.textContent = '已导出 ' + records.length + ' 条记录';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1500);
         });
 
         // ========== 初始化 ==========
